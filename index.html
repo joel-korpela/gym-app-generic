@@ -969,7 +969,7 @@ function loadData() {
 
   try { const p = localStorage.getItem('gs_planA'); if (p) planA = JSON.parse(p); } catch(e) {}
   try { const p = localStorage.getItem('gs_planB'); if (p) planB = JSON.parse(p); } catch(e) {}
-  try { const p = localStorage.getItem('gs_activePlan'); if (p) activePlan = p || null; } catch(e) {}
+  try { const p = localStorage.getItem('gs_activePlan'); if (p !== null) activePlan = p || null; } catch(e) {}
 
   try {
     const c = localStorage.getItem('gs_current');
@@ -1450,6 +1450,7 @@ function finishWorkout() {
   if (nextPlan) {
     activePlan = nextPlan;
     selectedExerciseNames = (activePlan === 'A' ? planA : planB).slice();
+    persist();
   }
 
   newWorkout(true);  // start fresh, keep weights pre-filled
