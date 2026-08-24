@@ -621,6 +621,55 @@
       text-align: right;
     }
 
+    /* ── Generic plan presets ───────────────── */
+    .generic-plans-section {
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .generic-plans-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+    .generic-plan-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .generic-plan-row:last-child { margin-bottom: 0; }
+    .generic-plan-select-btn {
+      flex: 1;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card2);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+    }
+    .generic-plan-select-btn:active { background: var(--blue); }
+    .generic-plan-save-a-btn,
+    .generic-plan-save-b-btn {
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1.5px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
     /* ── Empty state ─────────────────────────── */
     .empty {
       text-align: center;
@@ -698,6 +747,24 @@
     <div id="tab-exercises" class="section">
       <div class="exsel-wrap">
         <div class="exsel-count" id="exsel-count"></div>
+        <div class="generic-plans-section">
+          <div class="generic-plans-title">🎯 Valmiit ohjelmat</div>
+          <div class="generic-plan-row">
+            <button class="generic-plan-select-btn" onclick="applyGenericPlan('golden6', null)">⭐ Golden Six</button>
+            <button class="generic-plan-save-a-btn" onclick="applyGenericPlan('golden6', 'A')">→ A</button>
+            <button class="generic-plan-save-b-btn" onclick="applyGenericPlan('golden6', 'B')">→ B</button>
+          </div>
+          <div class="generic-plan-row">
+            <button class="generic-plan-select-btn" onclick="applyGenericPlan('presetA', null)">🅐 Kyykky · Penkki · Kulmasoutu</button>
+            <button class="generic-plan-save-a-btn" onclick="applyGenericPlan('presetA', 'A')">→ A</button>
+            <button class="generic-plan-save-b-btn" onclick="applyGenericPlan('presetA', 'B')">→ B</button>
+          </div>
+          <div class="generic-plan-row">
+            <button class="generic-plan-select-btn" onclick="applyGenericPlan('presetB', null)">🅑 Pystypunnerrus · Maastaveto · Ylätalja</button>
+            <button class="generic-plan-save-a-btn" onclick="applyGenericPlan('presetB', 'A')">→ A</button>
+            <button class="generic-plan-save-b-btn" onclick="applyGenericPlan('presetB', 'B')">→ B</button>
+          </div>
+        </div>
         <div class="exsel-actions">
           <button onclick="selectAllExercises()">✅ Valitse kaikki</button>
           <button onclick="clearAllExercises()">☐ Tyhjennä</button>
@@ -1264,6 +1331,32 @@ function selectAllExercises() {
 function clearAllExercises() {
   pendingSelection = [];
   renderExerciseSelect();
+}
+
+// ─────────────────────────────────────────────
+//  GENERIC PLAN PRESETS
+// ─────────────────────────────────────────────
+var GENERIC_PLANS = {
+  golden6: ['Kyykky', 'Penkkipunnerrus', 'Leuanveto', 'Pystypunnerrus', 'Hauiskääntö', 'Maastaveto'],
+  presetA: ['Kyykky', 'Penkkipunnerrus', 'Kulmasoutu tangolla'],
+  presetB: ['Pystypunnerrus', 'Maastaveto', 'Ylätalja']
+};
+
+function applyGenericPlan(planKey, saveLetter) {
+  var names = GENERIC_PLANS[planKey];
+  if (!names) return;
+  // Filter to only names that exist in ALL_EXERCISES
+  var validNames = names.filter(function(n) {
+    return ALL_EXERCISES.some(function(e) { return e.name === n; });
+  });
+  // Set pending selection to the preset exercises
+  pendingSelection = validNames.slice();
+  renderExerciseSelect();
+  if (saveLetter) {
+    saveAsPlan(saveLetter);
+  } else {
+    showToast('✅ Valittu: ' + validNames.join(', '));
+  }
 }
 
 function applyExerciseSelection() {
