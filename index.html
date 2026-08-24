@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Golden Six">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="description" content="Arnoldin Golden Six -treeniohjelma – PWA">
+  <title>🏋️ Golden Six</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --card: #16213e;
+      --card2: #1e2d50;
+      --deep: #0d1b35;
+      --accent: #f0a500;
+      --accent-dim: #c47e00;
+      --blue: #0f3460;
+      --text: #e0e0e0;
+      --muted: #888;
+      --border: #2a3f6f;
+      --danger: #e05252;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+      font-size: 16px;
+      overscroll-behavior: none;
+    }
+
+    /* ── Layout ─────────────────────────────── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: -webkit-fill-available;
+    }
+
+    /* ── Header ──────────────────────────────── */
+    #header {
+      background: var(--card);
+      padding: env(safe-area-inset-top, 12px) 16px 12px;
+      border-bottom: 2px solid var(--accent);
+      flex-shrink: 0;
+    }
+    #header h1 {
+      color: var(--accent);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .variant-badge {
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 13px;
+      font-weight: 800;
+      padding: 1px 9px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+    }
+    .ex-muscles {
+      font-size: 10px;
+      color: #4d6a9a;
+      margin-top: 2px;
+      font-style: italic;
+    }
+    #header .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 1px;
+    }
+
+    /* ── Timer bar ───────────────────────────── */
+    #timer-bar {
+      background: var(--blue);
+      padding: 10px 16px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    #timer-bar.active { display: flex; }
+    #timer-display {
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 72px;
+      font-variant-numeric: tabular-nums;
+    }
+    #timer-display.urgent { color: var(--danger); }
+    #timer-label { color: #ccc; flex: 1; font-size: 14px; }
+    #timer-skip-btn {
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ── Tabs ────────────────────────────────── */
+    #tabs {
+      display: flex;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .tab {
+      flex: 1;
+      padding: 11px 4px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── Scroll area ─────────────────────────── */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 80px;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── Progress bar ────────────────────────── */
+    .progress-wrap {
+      padding: 10px 16px 0;
+    }
+    .progress-track {
+      height: 5px;
+      background: var(--blue);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .progress-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Exercise card ───────────────────────── */
+    .ex-card {
+      margin: 10px 12px;
+      background: var(--card);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .ex-head {
+      padding: 13px 14px;
+      background: var(--card2);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .ex-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .ex-note {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+    .ex-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .ex-prev {
+      font-size: 11px;
+      color: #5a7aaa;
+      text-align: right;
+      flex-shrink: 0;
+      max-width: 38%;
+      line-height: 1.4;
+    }
+
+    /* ── Set row ─────────────────────────────── */
+    .set-row {
+      display: flex;
+      align-items: center;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--deep);
+      gap: 8px;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .set-row:last-child { border-bottom: none; }
+    .set-row.done {
+      background: rgba(13,27,53,0.5);
+    }
+    .set-row.done .set-inp { opacity: 0.45; }
+
+    .set-badge {
+      width: 26px;
+      height: 26px;
+      background: var(--blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .set-fields {
+      display: flex;
+      gap: 7px;
+      flex: 1;
+    }
+    .set-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+    .set-field.reps-field {
+      flex: 0 0 70px;
+    }
+    .set-field-label {
+      font-size: 10px;
+      color: #555566;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .set-inp {
+      background: var(--deep);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 600;
+      padding: 7px 9px;
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .set-inp:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .set-inp[readonly] {
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .check-btn {
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 10px;
+      white-space: nowrap;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .check-btn.checked {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+
+    /* ── Weight adjust buttons ───────────────── */
+    .weight-inp-wrap {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .weight-adj {
+      width: 30px;
+      height: 36px;
+      border-radius: 7px;
+      border: 1.5px solid var(--border);
+      background: var(--blue);
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+    }
+    .weight-adj:disabled { opacity: 0.3; cursor: default; }
+
+    /* ── Variant switch button ───────────────── */
+    .variant-switch-btn {
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      vertical-align: middle;
+    }
+
+    /* ── Mark all done button ────────────────── */
+    .mark-all-btn {
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── Bottom action bar ───────────────────── */
+    #action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 10px 12px env(safe-area-inset-bottom, 10px);
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+    }
+    #action-bar.hidden { display: none; }
+    .btn {
+      flex: 1;
+      padding: 15px 10px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: -0.2px;
+    }
+    .btn-gold { background: var(--accent); color: var(--bg); }
+    .btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      flex: 0 0 auto;
+      padding: 15px 14px;
+    }
+
+    /* ── History ─────────────────────────────── */
+    .hist-item {
+      margin: 10px 12px;
+      background: var(--card);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    .hist-date {
+      padding: 11px 14px;
+      background: var(--card2);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hist-date-right {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hist-delete-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      padding: 2px 4px;
+      border-radius: 6px;
+      line-height: 1;
+      opacity: 0.55;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    .hist-delete-btn:hover, .hist-delete-btn:active { opacity: 1; background: rgba(224,82,82,0.18); }
+    .hist-clear-btn {
+      background: rgba(224,82,82,0.12);
+      border: 1px solid rgba(224,82,82,0.35);
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .hist-clear-btn:hover, .hist-clear-btn:active { background: rgba(224,82,82,0.25); }
+    .hist-body { padding: 4px 0; }
+    .hist-ex {
+      padding: 7px 14px;
+      border-bottom: 1px solid var(--deep);
+      font-size: 13px;
+    }
+    .hist-ex:last-child { border-bottom: none; }
+    .hist-ex-name { color: #ccc; font-weight: 600; }
+    .hist-ex-sets { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+    /* ── Cloud section ───────────────────────── */
+    .cloud-wrap { padding: 16px 12px; }
+    .cloud-btn {
+      width: 100%;
+      padding: 18px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: -0.2px;
+    }
+    .cloud-btn-save { background: var(--accent); color: var(--bg); }
+    .cloud-btn-restore { background: var(--blue); color: var(--text); }
+    .cloud-info {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .cloud-info strong { color: var(--text); }
+    .cloud-info p { margin-bottom: 4px; }
+
+    /* ── Empty state ─────────────────────────── */
+    .empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: #444;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ── Toast ───────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 200;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <div id="header">
+    <h1>🏋️ Golden Six <span id="variant-badge" class="variant-badge">A</span> <button class="variant-switch-btn" onclick="switchVariant()">A↔B</button></h1>
+    <div class="subtitle" id="header-date">Arnoldin ohjelma · Fullbody 3×/vk</div>
+  </div>
+
+  <!-- Timer bar -->
+  <div id="timer-bar">
+    <div id="timer-display">2:00</div>
+    <div id="timer-label">⏱️ Palautusaika</div>
+    <button id="timer-skip-btn" onclick="skipTimer()">Ohita ⏭</button>
+  </div>
+
+  <!-- Tabs -->
+  <div id="tabs">
+    <div class="tab active" data-tab="workout" onclick="showTab('workout')">🏋️ Treeni</div>
+    <div class="tab" data-tab="history" onclick="showTab('history')">📅 Historia</div>
+    <div class="tab" data-tab="cloud" onclick="showTab('cloud')">☁️ iCloud</div>
+  </div>
+
+  <!-- Scrollable content -->
+  <div id="content">
+
+    <!-- WORKOUT TAB -->
+    <div id="tab-workout" class="section active">
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+        <div class="progress-label" id="prog-label">0 / 0 sarjaa tehty</div>
+      </div>
+      <div id="exercises"></div>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div id="tab-history" class="section">
+      <div id="history-actions" style="padding:12px 12px 0;display:flex;justify-content:flex-end;">
+        <button class="hist-clear-btn" onclick="clearAllHistory()">🗑️ Tyhjennä historia</button>
+      </div>
+      <div id="history"></div>
+    </div>
+
+    <!-- CLOUD TAB -->
+    <div id="tab-cloud" class="section">
+      <div class="cloud-wrap">
+        <button class="cloud-btn cloud-btn-save" onclick="exportBackup()">☁️ Tallenna iCloudiin</button>
+        <button class="cloud-btn cloud-btn-restore" onclick="document.getElementById('file-in').click()">📥 Palauta varmuuskopiosta</button>
+        <input type="file" id="file-in" accept=".json" style="display:none" onchange="importBackup(event)">
+        <div class="cloud-info">
+          <p><strong>Miten varmuuskopiointi toimii:</strong></p>
+          <p>1️⃣ Paina "Tallenna iCloudiin" – JSON-tiedosto latautuu</p>
+          <p>2️⃣ Tallenna tiedosto <strong>iCloudin Tiedostot-appiin</strong></p>
+          <p>3️⃣ Tiedosto synkronoituu automaattisesti iCloudiin 🎉</p>
+          <p>4️⃣ Palauta koska tahansa "Palauta varmuuskopiosta" -napilla</p>
+          <br>
+          <p>💡 <strong>Vinkki:</strong> Ota varmuuskopio ennen puhelimen vaihtoa tai Safarin välimuistin tyhjennystä!</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Action bar (workout tab only) -->
+  <div id="action-bar">
+    <button class="btn btn-ghost" onclick="resetWorkout()">🔄 Nollaa rastit</button>
+    <button class="btn btn-gold" onclick="finishWorkout()">✅ Valmis – tallenna treeni</button>
+  </div>
+
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+//  HTML ESCAPING HELPER
+// ─────────────────────────────────────────────
+function esc(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ─────────────────────────────────────────────
+//  EXERCISE DEFINITIONS – Golden Six 2020
+//  Exercises 1, 3 and 5 alternate A/B each session
+// ─────────────────────────────────────────────
+const EXERCISE_VARIANTS = {
+  A: [
+    { name: 'Kyykky',                  emoji: '🦵', sets: 4, reps: 10,      rest: 120,
+      muscles: 'Pakarat, etureidet' },
+    { name: 'Penkkipunnerrus',         emoji: '💪', sets: 3, reps: 10,      rest: 120,
+      note: 'leveä ote', muscles: 'Rinta, ojentaja, olkapäät' },
+    { name: 'Leuanveto',               emoji: '🔝', sets: 3, reps: 'max',   rest: 120,
+      note: 'leveä myötäote', muscles: 'Selkä, epäkäs, hauis' },
+    { name: 'Pystypunnerrus',          emoji: '🙌', sets: 3, reps: 10,      rest: 120,
+      muscles: 'Olkapäät, ojentajat' },
+    { name: 'Vipunostot kulmassa',     emoji: '🎯', sets: 1, reps: 12,      rest: 120,
+      note: 'takaolkapäät', muscles: 'Takaolkapäät' },
+    { name: 'Hauiskääntö',             emoji: '💪', sets: 2, reps: 10,      rest: 90,
+      note: 'tangolla, käänteisote', muscles: 'Hauis, brachialis' },
+    { name: 'Hauiskääntö myötäote',    emoji: '🔄', sets: 1, reps: 10,      rest: 90,
+      note: 'brachialis', muscles: 'Brachialis' },
+    { name: 'Vatsalihasliike',         emoji: '🔥', sets: 3, reps: '15-20', rest: 60,
+      note: 'eri liikkeitä', muscles: 'Vatsalihakset' }
+  ],
+  B: [
+    { name: 'Suorin jaloin maastaveto', emoji: '🏋️', sets: 4, reps: 10,      rest: 120,
+      muscles: 'Takareidet, pakarat, selkä' },
+    { name: 'Penkkipunnerrus',          emoji: '💪', sets: 3, reps: 10,      rest: 120,
+      note: 'leveä ote', muscles: 'Rinta, ojentaja, olkapäät' },
+    { name: 'Kulmasoutu',               emoji: '🔙', sets: 3, reps: 10,      rest: 120,
+      note: 'levytangolla', muscles: 'Selkä, epäkäs, hauis' },
+    { name: 'Pystypunnerrus',           emoji: '🙌', sets: 3, reps: 10,      rest: 120,
+      muscles: 'Olkapäät, ojentajat' },
+    { name: 'Vipunostot kulmassa',      emoji: '🎯', sets: 1, reps: 12,      rest: 120,
+      note: 'takaolkapäät', muscles: 'Takaolkapäät' },
+    { name: 'Ranskalainen punnerrus',   emoji: '🦾', sets: 3, reps: 10,      rest: 90,
+      muscles: 'Ojentajat' },
+    { name: 'Vatsalihasliike',          emoji: '🔥', sets: 3, reps: '15-20', rest: 60,
+      note: 'eri liikkeitä', muscles: 'Vatsalihakset' }
+  ]
+};
+
+function activeExercises() {
+  return EXERCISE_VARIANTS[workoutVariant];
+}
+
+function getExDef(name) {
+  const all = [...EXERCISE_VARIANTS.A, ...EXERCISE_VARIANTS.B];
+  return all.find(function(e) { return e.name === name; }) ||
+    { name: name, emoji: '🏋️', sets: 0, reps: 0, rest: 120, note: '', muscles: '' };
+}
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let currentWorkout = null;   // { date, variant, exercises:[{name, sets:[{weight,reps,done}]}] }
+let workoutHistory  = [];    // array of saved workouts
+let workoutVariant  = 'A';   // 'A' or 'B', alternates each saved workout
+
+let timerInterval  = null;
+let timerRemaining = 0;
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+function init() {
+  loadData();
+  renderWorkout();
+  renderHistory();
+  updateDate();
+}
+
+function updateDate() {
+  const d = new Date();
+  document.getElementById('header-date').textContent =
+    'Tänään: ' + fmtDate(d) + ' · Arnoldin ohjelma 2020';
+}
+
+// ─────────────────────────────────────────────
+//  PERSISTENCE
+// ─────────────────────────────────────────────
+function loadData() {
+  try {
+    const h = localStorage.getItem('gs_history');
+    if (h) workoutHistory = JSON.parse(h);
+  } catch(e) { workoutHistory = []; }
+
+  try {
+    const v = localStorage.getItem('gs_variant');
+    if (v === 'A' || v === 'B') workoutVariant = v;
+  } catch(e) {}
+
+  try {
+    const c = localStorage.getItem('gs_current');
+    if (c) {
+      currentWorkout = JSON.parse(c);
+      if (currentWorkout.variant === 'A' || currentWorkout.variant === 'B') {
+        workoutVariant = currentWorkout.variant;
+      }
+      backfillWeights();
+    } else {
+      newWorkout();
+    }
+  } catch(e) {
+    newWorkout();
+  }
+}
+
+// Back-fill missing weights from history into the current workout (one-time migration).
+function backfillWeights() {
+  if (!currentWorkout) return;
+  const prevWeightsByName = {};
+  for (let wi = workoutHistory.length - 1; wi >= 0; wi--) {
+    workoutHistory[wi].exercises.forEach(function(ex) {
+      if (!prevWeightsByName[ex.name]) {
+        prevWeightsByName[ex.name] = ex.sets;
+      }
+    });
+  }
+  let changed = false;
+  currentWorkout.exercises.forEach(function(ex) {
+    const lastSets = prevWeightsByName[ex.name];
+    if (!lastSets) return;
+    ex.sets.forEach(function(set, si) {
+      if (set.weight === '' && lastSets[si] && lastSets[si].weight) {
+        set.weight = String(lastSets[si].weight);
+        changed = true;
+      }
+    });
+  });
+  if (changed) persist();
+}
+
+function persist() {
+  localStorage.setItem('gs_current',  JSON.stringify(currentWorkout));
+  localStorage.setItem('gs_history',  JSON.stringify(workoutHistory));
+  localStorage.setItem('gs_variant',  workoutVariant);
+}
+
+function newWorkout(keepWeights) {
+  // Toggle variant only when starting a fresh workout after saving
+  if (keepWeights) {
+    workoutVariant = workoutVariant === 'A' ? 'B' : 'A';
+  }
+  const exDefs = activeExercises();
+
+  // Build previous weights per exercise name (search full history, newest first)
+  const prevWeightsByName = {};
+  if (workoutHistory.length > 0) {
+    for (let wi = workoutHistory.length - 1; wi >= 0; wi--) {
+      const hw = workoutHistory[wi];
+      hw.exercises.forEach(function(ex) {
+        if (!prevWeightsByName[ex.name]) {
+          prevWeightsByName[ex.name] = ex.sets.map(function(s) { return s.weight || ''; });
+        }
+      });
+    }
+  }
+
+  currentWorkout = {
+    date:     new Date().toISOString(),
+    variant:  workoutVariant,
+    exercises: exDefs.map(function(ex, i) {
+      return {
+        name: ex.name,
+        sets: Array.from({ length: ex.sets }, function(_, j) {
+          return {
+            weight: keepWeights ? (prevWeightsByName[ex.name] && prevWeightsByName[ex.name][j] != null
+                     ? prevWeightsByName[ex.name][j] : '') : '',
+            reps:   '',
+            done:   false
+          };
+        })
+      };
+    })
+  };
+  persist();
+}
+
+// ─────────────────────────────────────────────
+//  RENDER WORKOUT
+// ─────────────────────────────────────────────
+function renderWorkout() {
+  const container = document.getElementById('exercises');
+  container.innerHTML = '';
+
+  // Update variant badge in header
+  const badge = document.getElementById('variant-badge');
+  if (badge) badge.textContent = workoutVariant;
+
+  const exDefs = activeExercises();
+
+  // Build a lookup of last weights per exercise name from history
+  const prevWeightsByName = {};
+  if (workoutHistory.length > 0) {
+    for (let wi = workoutHistory.length - 1; wi >= 0; wi--) {
+      const hw = workoutHistory[wi];
+      hw.exercises.forEach(function(ex) {
+        if (!prevWeightsByName[ex.name]) {
+          prevWeightsByName[ex.name] = ex.sets;
+        }
+      });
+    }
+  }
+
+  let needsWeightPersist = false;
+
+  exDefs.forEach(function(def, ei) {
+    const ex       = currentWorkout.exercises[ei];
+    const lastSets = prevWeightsByName[def.name];
+
+    // Build previous weights summary
+    let prevHtml = '';
+    if (lastSets) {
+      const pw = lastSets.filter(function(s) { return s.weight; }).map(function(s) { return esc(s.weight) + 'kg'; });
+      if (pw.length) {
+        prevHtml = '<div class="ex-prev">📊 Edellinen:<br>' + pw.join(' / ') + '</div>';
+      }
+    }
+
+    const noteHtml    = def.note    ? ' <span class="ex-note">(' + def.note + ')</span>'  : '';
+    const musclesHtml = def.muscles ? '<div class="ex-muscles">💪 ' + def.muscles + '</div>' : '';
+    const repsLabel   = def.reps === 'max' ? 'max toistoa' : (def.reps + ' toistoa');
+
+    const allDone = ex.sets.every(function(s) { return s.done; });
+    const markAllBtnHtml = allDone ? '' :
+      '<button class="mark-all-btn" onclick="markAllDone(' + ei + ')">✓ Kaikki tehty</button>';
+
+    const card = document.createElement('div');
+    card.className = 'ex-card';
+    card.id = 'card-' + ei;
+    card.innerHTML =
+      '<div class="ex-head">' +
+        '<div>' +
+          '<div class="ex-name">' + def.emoji + ' ' + def.name + noteHtml + '</div>' +
+          '<div class="ex-meta">' + def.sets + ' sarjaa × ' + repsLabel + '</div>' +
+          musclesHtml +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' +
+          (prevHtml ? prevHtml : '') +
+          markAllBtnHtml +
+        '</div>' +
+      '</div>';
+
+    ex.sets.forEach(function(set, si) {
+      const prevSet = lastSets && lastSets[si];
+      const wHint   = prevSet && prevSet.weight ? esc(prevSet.weight) + 'kg' : '';
+      const rHint   = prevSet && prevSet.reps   ? esc(prevSet.reps) + '' : (def.reps === 'max' ? 'max' : def.reps + '');
+
+      const row = document.createElement('div');
+      row.className = 'set-row' + (set.done ? ' done' : '');
+      row.id = 'row-' + ei + '-' + si;
+      row.innerHTML =
+        '<div class="set-badge">' + (si + 1) + '</div>' +
+        '<div class="set-fields">' +
+          '<div class="set-field">' +
+            '<span class="set-field-label">Paino kg</span>' +
+            '<div class="weight-inp-wrap">' +
+              '<button class="weight-adj"' + (set.done ? ' disabled' : '') +
+              ' onclick="adjustWeight(' + ei + ',' + si + ',-2.5)">−</button>' +
+              '<input class="set-inp" type="number" inputmode="decimal"' +
+              ' placeholder="' + (wHint || '—') + '"' +
+              ' value="' + esc(set.weight) + '"' +
+              (set.done ? ' readonly' : '') +
+              ' onchange="updSet(' + ei + ',' + si + ',\'weight\',this.value)">' +
+              '<button class="weight-adj"' + (set.done ? ' disabled' : '') +
+              ' onclick="adjustWeight(' + ei + ',' + si + ',2.5)">+</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="set-field reps-field">' +
+            '<span class="set-field-label">Toistot</span>' +
+            '<input class="set-inp reps-inp" type="text" inputmode="numeric"' +
+            ' placeholder="' + rHint + '"' +
+            ' value="' + esc(set.reps) + '"' +
+            (set.done ? ' readonly' : '') +
+            ' onchange="updSet(' + ei + ',' + si + ',\'reps\',this.value)">' +
+          '</div>' +
+        '</div>' +
+        '<button class="check-btn' + (set.done ? ' checked' : '') + '"' +
+        ' onclick="toggleSet(' + ei + ',' + si + ')">' + (set.done ? '✓ Tehty' : '✓ Sarja tehty') + '</button>';
+      card.appendChild(row);
+    });
+
+    container.appendChild(card);
+  });
+
+  updateProgress();
+}
+
+function updateProgress() {
+  let total = 0, done = 0;
+  currentWorkout.exercises.forEach(function(ex) {
+    ex.sets.forEach(function(s) { total++; if (s.done) done++; });
+  });
+  const pct = total ? (done / total * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent =
+    'Treeni ' + workoutVariant + ' · ' + done + ' / ' + total + ' sarjaa tehty';
+}
+
+// ─────────────────────────────────────────────
+//  SET INTERACTIONS
+// ─────────────────────────────────────────────
+function updSet(ei, si, field, val) {
+  currentWorkout.exercises[ei].sets[si][field] = val;
+  persist();
+}
+
+function adjustWeight(ei, si, delta) {
+  const set = currentWorkout.exercises[ei].sets[si];
+  if (set.done) return;
+  const row = document.getElementById('row-' + ei + '-' + si);
+  const inp = row ? row.querySelector('.set-inp') : null;
+  // Use visible input value so display-defaulted values are respected
+  const current = inp ? (parseFloat(inp.value) || 0) : (parseFloat(set.weight) || 0);
+  const next = Math.max(0, Math.round((current + delta) * 10) / 10);
+  const nextStr = next === 0 ? '' : String(next);
+  set.weight = nextStr;
+  persist();
+  if (inp) inp.value = nextStr;
+}
+
+function switchVariant() {
+  const next = workoutVariant === 'A' ? 'B' : 'A';
+  if (!confirm('Vaihdetaan treeni ' + next + '?\nNykyiset rastit nollataan.')) return;
+  workoutVariant = next;
+  newWorkout(false);
+  stopTimer();
+  renderWorkout();
+  showToast('🔄 Vaihdettu treeni ' + workoutVariant);
+}
+
+function toggleSet(ei, si) {
+  const set = currentWorkout.exercises[ei].sets[si];
+  const row = document.getElementById('row-' + ei + '-' + si);
+
+  // Auto-fill reps from placeholder when marking as done and reps is empty
+  if (!set.done && !set.reps && row) {
+    const repsInp = row.querySelector('.reps-inp');
+    if (repsInp && repsInp.placeholder) {
+      set.reps = repsInp.placeholder;
+    }
+  }
+
+  set.done = !set.done;
+  persist();
+
+  // Update row DOM
+  if (!row) return;
+  row.className = 'set-row' + (set.done ? ' done' : '');
+  row.querySelectorAll('.set-inp').forEach(function(inp) {
+    if (set.done) inp.setAttribute('readonly', ''); else inp.removeAttribute('readonly');
+  });
+  // Sync reps display (may have been auto-filled)
+  const repsInp = row.querySelector('.reps-inp');
+  if (repsInp) repsInp.value = set.reps;
+  // Enable/disable weight adjust buttons
+  row.querySelectorAll('.weight-adj').forEach(function(b) { b.disabled = set.done; });
+  const btn = row.querySelector('.check-btn');
+  btn.className = 'check-btn' + (set.done ? ' checked' : '');
+  btn.textContent = set.done ? '✓ Tehty' : '✓ Sarja tehty';
+
+  updateProgress();
+
+  // Update visibility of the "mark all done" button for this exercise
+  const card = document.getElementById('card-' + ei);
+  if (card) {
+    const allNowDone = currentWorkout.exercises[ei].sets.every(function(s) { return s.done; });
+    const markBtn = card.querySelector('.mark-all-btn');
+    if (allNowDone && markBtn) {
+      markBtn.remove();
+    } else if (!allNowDone && !markBtn) {
+      const markAllBtn = document.createElement('button');
+      markAllBtn.className = 'mark-all-btn';
+      markAllBtn.setAttribute('onclick', 'markAllDone(' + ei + ')');
+      markAllBtn.textContent = '✓ Kaikki tehty';
+      card.querySelector('.ex-head > div:last-child').appendChild(markAllBtn);
+    }
+  }
+
+  if (set.done) {
+    startTimer(activeExercises()[ei].rest);
+  }
+}
+
+function markAllDone(ei) {
+  const ex = currentWorkout.exercises[ei];
+  ex.sets.forEach(function(set, si) {
+    if (set.done) return;
+    // Auto-fill reps from placeholder if empty
+    const row = document.getElementById('row-' + ei + '-' + si);
+    if (!set.reps && row) {
+      const repsInp = row.querySelector('.reps-inp');
+      if (repsInp && repsInp.placeholder) {
+        set.reps = repsInp.placeholder;
+      }
+    }
+    set.done = true;
+    // Update row DOM
+    if (row) {
+      row.className = 'set-row done';
+      row.querySelectorAll('.set-inp').forEach(function(inp) { inp.setAttribute('readonly', ''); });
+      const repsInp = row.querySelector('.reps-inp');
+      if (repsInp) repsInp.value = set.reps;
+      row.querySelectorAll('.weight-adj').forEach(function(b) { b.disabled = true; });
+      const btn = row.querySelector('.check-btn');
+      if (btn) { btn.className = 'check-btn checked'; btn.textContent = '✓ Tehty'; }
+    }
+  });
+  persist();
+  // Hide the "mark all done" button since all sets are now done
+  const card = document.getElementById('card-' + ei);
+  if (card) {
+    const markBtn = card.querySelector('.mark-all-btn');
+    if (markBtn) markBtn.remove();
+  }
+  updateProgress();
+}
+
+// ─────────────────────────────────────────────
+//  TIMER
+// ─────────────────────────────────────────────
+function startTimer(secs) {
+  stopTimer();
+  timerRemaining = secs;
+  document.getElementById('timer-bar').classList.add('active');
+  document.getElementById('timer-label').textContent = '⏱️ Palautusaika';
+  renderTimer();
+  timerInterval = setInterval(() => {
+    timerRemaining--;
+    renderTimer();
+    if (timerRemaining <= 0) { stopTimer(); timerAlert(); }
+  }, 1000);
+}
+
+function renderTimer() {
+  const m = Math.floor(timerRemaining / 60);
+  const s = timerRemaining % 60;
+  const disp = document.getElementById('timer-display');
+  disp.textContent = `${m}:${String(s).padStart(2, '0')}`;
+  disp.className = timerRemaining <= 10 ? 'urgent' : '';
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  document.getElementById('timer-bar').classList.remove('active');
+}
+
+function skipTimer() { stopTimer(); }
+
+function timerAlert() {
+  document.getElementById('timer-label').textContent = '✅ Palautus ohi! Jatka!';
+  // Vibrate
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+  // Beep
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[880, 0, 0.18], [880, 0.25, 0.18], [1100, 0.5, 0.35]].forEach(([f, t, d]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = f; o.type = 'sine';
+      g.gain.setValueAtTime(0.35, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + d);
+      o.start(ctx.currentTime + t);
+      o.stop(ctx.currentTime + t + d + 0.05);
+    });
+  } catch(_) {}
+}
+
+// ─────────────────────────────────────────────
+//  WORKOUT ACTIONS
+// ─────────────────────────────────────────────
+function finishWorkout() {
+  const done = currentWorkout.exercises.reduce((n, ex) =>
+    n + ex.sets.filter(s => s.done).length, 0);
+
+  if (done === 0) {
+    showToast('💪 Tee ensin sarjoja!');
+    return;
+  }
+
+  if (!confirm(`Tallennetaan treeni (${done} sarjaa tehty)?\n\nUusi treeni alkaa heti.`)) return;
+
+  workoutHistory.push({ ...currentWorkout, savedAt: new Date().toISOString() });
+  newWorkout(true);  // start fresh, keep weights pre-filled
+  stopTimer();
+  renderWorkout();
+  renderHistory();
+  showTab('workout');
+  showToast('💪 Hyvä treeni! Tallennettu historiaan ✅');
+}
+
+function resetWorkout() {
+  if (!confirm('Nollataan rastit? Painot ja historia säilyvät.')) return;
+  currentWorkout.exercises.forEach(ex => ex.sets.forEach(s => { s.done = false; }));
+  persist();
+  stopTimer();
+  renderWorkout();
+  showToast('🔄 Rastit nollattu');
+}
+
+// ─────────────────────────────────────────────
+//  HISTORY
+// ─────────────────────────────────────────────
+function renderHistory() {
+  const container = document.getElementById('history');
+  container.innerHTML = '';
+
+  if (!workoutHistory.length) {
+    container.innerHTML = '<div class="empty">📭 Ei vielä treenihistoriaa.<br><br>Tee ensimmäinen treeni ja tallenna se! 💪</div>';
+    return;
+  }
+
+  var list = workoutHistory.slice().reverse();
+  list.forEach(function(w, ri) {
+    var origIdx = workoutHistory.length - 1 - ri;
+    var date    = new Date(w.date);
+    var dayStr  = fmtDate(date);
+    var timeStr = date.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
+    var vLabel  = w.variant ? ' · Treeni ' + esc(w.variant) : '';
+
+    var exHtml = '';
+    w.exercises.forEach(function(ex) {
+      var doneSets = ex.sets.filter(function(s) { return s.done; });
+      if (!doneSets.length) return;
+      var def = getExDef(ex.name);
+      var setStrs = doneSets.map(function(s) {
+        var parts = [];
+        if (s.weight) parts.push(esc(s.weight) + ' kg');
+        if (s.reps)   parts.push(esc(s.reps) + ' toistoa');
+        return parts.join(' × ') || '✓';
+      });
+      exHtml +=
+        '<div class="hist-ex">' +
+          '<div class="hist-ex-name">' + def.emoji + ' ' + esc(ex.name) + '</div>' +
+          '<div class="hist-ex-sets">' + doneSets.length + ' sarjaa · ' + setStrs.join(', ') + '</div>' +
+        '</div>';
+    });
+
+    if (!exHtml) exHtml = '<div class="hist-ex" style="color:#444">—</div>';
+
+    var item = document.createElement('div');
+    item.className = 'hist-item';
+    item.innerHTML =
+      '<div class="hist-date">' +
+        '📅 ' + dayStr + vLabel +
+        '<span class="hist-date-right">' +
+          timeStr +
+          '<button class="hist-delete-btn" onclick="deleteWorkout(' + origIdx + ')" title="Poista treeni" aria-label="Poista treeni">🗑️</button>' +
+        '</span>' +
+      '</div>' +
+      '<div class="hist-body">' + exHtml + '</div>';
+    container.appendChild(item);
+  });
+}
+
+function syncCurrentWeightsFromHistory() {
+  if (!currentWorkout) return;
+  const prevWeightsByName = {};
+  for (let wi = workoutHistory.length - 1; wi >= 0; wi--) {
+    workoutHistory[wi].exercises.forEach(function(ex) {
+      if (!prevWeightsByName[ex.name]) {
+        prevWeightsByName[ex.name] = ex.sets.map(function(s) { return s.weight || ''; });
+      }
+    });
+  }
+  currentWorkout.exercises.forEach(function(ex) {
+    const lastWeights = prevWeightsByName[ex.name];
+    ex.sets.forEach(function(set, si) {
+      if (!set.done) {
+        set.weight = (lastWeights && lastWeights[si] != null) ? lastWeights[si] : '';
+      }
+    });
+  });
+  persist();
+}
+
+function deleteWorkout(idx) {
+  if (!confirm('Poistetaanko tämä treeni historiasta?')) return;
+  workoutHistory.splice(idx, 1);
+  syncCurrentWeightsFromHistory();
+  renderWorkout();
+  renderHistory();
+  showToast('🗑️ Treeni poistettu historiasta');
+}
+
+function clearAllHistory() {
+  if (!workoutHistory.length) { showToast('📭 Historia on jo tyhjä'); return; }
+  if (!confirm('Tyhjennetäänkö koko treenihistoria?\n\nTätä ei voi peruuttaa.')) return;
+  workoutHistory = [];
+  syncCurrentWeightsFromHistory();
+  renderWorkout();
+  renderHistory();
+  showToast('🗑️ Historia tyhjennetty');
+}
+
+// ─────────────────────────────────────────────
+//  iCLOUD BACKUP
+// ─────────────────────────────────────────────
+function exportBackup() {
+  const payload = {
+    _app:    'Golden Six PWA',
+    _ver:    2,
+    _date:   new Date().toISOString(),
+    workoutVariant,
+    currentWorkout,
+    workoutHistory
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href:     url,
+    download: `golden-six-${fmtDateFile(new Date())}.json`
+  });
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('☁️ Varmuuskopio ladattu – tallenna iCloud-kansioon!');
+}
+
+function importBackup(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.workoutHistory || !data.currentWorkout) throw new Error('Väärä tiedosto');
+      if (!confirm(`Palautetaan varmuuskopio?\n${data.workoutHistory.length} treeniä historiassa.\n\nNykyinen data ylikirjoitetaan.`)) return;
+      currentWorkout = data.currentWorkout;
+      workoutHistory = data.workoutHistory;
+      if (data.workoutVariant === 'A' || data.workoutVariant === 'B') {
+        workoutVariant = data.workoutVariant;
+      }
+      backfillWeights();
+      persist();
+      renderWorkout();
+      renderHistory();
+      showToast(`✅ Palautettu! ${workoutHistory.length} treeniä.`);
+    } catch (err) {
+      alert('❌ Virhe: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value = '';
+}
+
+// ─────────────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
+  const bar = document.getElementById('action-bar');
+  if (name === 'workout') bar.classList.remove('hidden');
+  else bar.classList.add('hidden');
+}
+
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
+const FI_WEEKDAYS = ['Su','Ma','Ti','Ke','To','Pe','La'];
+const FI_MONTHS   = [
+  'tammikuuta','helmikuuta','maaliskuuta','huhtikuuta','toukokuuta','kesäkuuta',
+  'heinäkuuta','elokuuta','syyskuuta','lokakuuta','marraskuuta','joulukuuta'
+];
+
+function fmtDate(d) {
+  return `${FI_WEEKDAYS[d.getDay()]} ${d.getDate()}. ${FI_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function fmtDateFile(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─────────────────────────────────────────────
+//  SERVICE WORKER (inline, offline support)
+// ─────────────────────────────────────────────
+function registerSW() {
+  if (!('serviceWorker' in navigator)) return;
+  const swSrc = `
+const CACHE = 'golden-six-v2';
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(['./']))
+      .then(() => self.skipWaiting())
+  );
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request))
+  );
+});`;
+  try {
+    const blob = new Blob([swSrc], { type: 'application/javascript' });
+    const url  = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).catch(() => {});
+  } catch(_) {}
+}
+
+// ─────────────────────────────────────────────
+//  BOOT
+// ─────────────────────────────────────────────
+registerSW();
+init();
+</script>
+</body>
+</html>
