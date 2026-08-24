@@ -709,7 +709,7 @@
   <!-- Header -->
   <div id="header">
     <h1>🏋️ Gym Tracker</h1>
-    <div class="subtitle" id="header-date">Treeniohjelma · Fullbody</div>
+    <div class="subtitle" id="header-date"></div>
     <div id="plan-info-bar">
       <span id="plan-badge">Treeni A</span>
       <button id="plan-switch-btn" onclick="switchPlan()">→ Treeni B</button>
@@ -772,7 +772,7 @@
         <div id="exsel-list"></div>
         <button class="exsel-apply-btn" onclick="applyExerciseSelection()">💪 Käytä valintaa treeniohjelmaassasi</button>
         <div class="plan-section">
-          <div class="plan-section-title">📋 Treenisuunnitelmat A / B</div>
+          <div class="plan-section-title">📋 Treenisuunnitelmat</div>
           <div class="plan-status" id="plan-status-text"></div>
           <div class="plan-btns">
             <button class="plan-save-btn" id="plan-save-a" onclick="saveAsPlan('A')">💾 Tallenna suunnitelmana A</button>
@@ -904,7 +904,7 @@ function init() {
 function updateDate() {
   const d = new Date();
   document.getElementById('header-date').textContent =
-    'Tänään: ' + fmtDate(d) + ' · Treeniohjelma';
+    'Tänään: ' + fmtDate(d);
 }
 
 // ─────────────────────────────────────────────
@@ -914,13 +914,19 @@ function renderPlanBadge() {
   const bar       = document.getElementById('plan-info-bar');
   const badge     = document.getElementById('plan-badge');
   const switchBtn = document.getElementById('plan-switch-btn');
-  if (activePlan && planA && planB) {
+  if (activePlan) {
     bar.classList.add('visible');
     badge.textContent = 'Treeni ' + activePlan;
-    const next = activePlan === 'A' ? 'B' : 'A';
-    switchBtn.textContent = '→ Treeni ' + next;
+    if (planA && planB) {
+      const next = activePlan === 'A' ? 'B' : 'A';
+      switchBtn.textContent = '→ Treeni ' + next;
+      switchBtn.style.display = '';
+    } else {
+      switchBtn.style.display = 'none';
+    }
   } else {
     bar.classList.remove('visible');
+    switchBtn.style.display = 'none';
   }
 }
 
