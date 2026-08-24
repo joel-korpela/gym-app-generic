@@ -320,6 +320,86 @@
     }
     .weight-adj:disabled { opacity: 0.3; cursor: default; }
 
+    /* ── Plan info bar ───────────────────────── */
+    #plan-info-bar {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    #plan-info-bar.visible { display: flex; }
+    #plan-badge {
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 2px 9px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+    }
+    #plan-switch-btn {
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* ── Plan section in exercise tab ────────── */
+    .plan-section {
+      margin-top: 16px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .plan-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+    }
+    .plan-status {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .plan-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .plan-save-btn {
+      flex: 1;
+      padding: 11px 8px;
+      border-radius: 10px;
+      border: 1.5px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 130px;
+    }
+    .plan-save-btn.active-plan {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    .plan-activate-btn {
+      flex: 1;
+      padding: 11px 8px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 130px;
+    }
+
     /* ── Variant switch button ───────────────── */
     .variant-switch-btn {
       background: transparent;
@@ -581,6 +661,10 @@
   <div id="header">
     <h1>🏋️ Gym Tracker</h1>
     <div class="subtitle" id="header-date">Treeniohjelma · Fullbody</div>
+    <div id="plan-info-bar">
+      <span id="plan-badge">Treeni A</span>
+      <button id="plan-switch-btn" onclick="switchPlan()">→ Treeni B</button>
+    </div>
   </div>
 
   <!-- Timer bar -->
@@ -620,6 +704,15 @@
         </div>
         <div id="exsel-list"></div>
         <button class="exsel-apply-btn" onclick="applyExerciseSelection()">💪 Käytä valintaa treeniohjelmaassasi</button>
+        <div class="plan-section">
+          <div class="plan-section-title">📋 Treenisuunnitelmat A / B</div>
+          <div class="plan-status" id="plan-status-text"></div>
+          <div class="plan-btns">
+            <button class="plan-save-btn" id="plan-save-a" onclick="saveAsPlan('A')">💾 Tallenna suunnitelmana A</button>
+            <button class="plan-save-btn" id="plan-save-b" onclick="saveAsPlan('B')">💾 Tallenna suunnitelmana B</button>
+          </div>
+          <div class="plan-btns" style="margin-top:8px" id="plan-activate-btns"></div>
+        </div>
       </div>
     </div>
 
@@ -678,7 +771,7 @@ function esc(str) {
 //  EXERCISE DEFINITIONS – all available exercises
 // ─────────────────────────────────────────────
 const ALL_EXERCISES = [
-  { name: 'Kyykky',                   emoji: '🦵', sets: 4, reps: 10,      rest: 120,
+  { name: 'Kyykky',                   emoji: '🦵', sets: 3, reps: 10,      rest: 120,
     muscles: 'Pakarat, etureidet' },
   { name: 'Penkkipunnerrus',          emoji: '💪', sets: 3, reps: 10,      rest: 120,
     note: 'leveä ote', muscles: 'Rinta, ojentaja, olkapäät' },
@@ -694,13 +787,13 @@ const ALL_EXERCISES = [
     note: 'brachialis', muscles: 'Brachialis' },
   { name: 'Vatsalihasliike',          emoji: '🔥', sets: 3, reps: '15-20', rest: 60,
     note: 'eri liikkeitä', muscles: 'Vatsalihakset' },
-  { name: 'Suorin jaloin maastaveto', emoji: '🏋️', sets: 4, reps: 10,      rest: 120,
+  { name: 'Suorin jaloin maastaveto', emoji: '🏋️', sets: 3, reps: 10,      rest: 120,
     muscles: 'Takareidet, pakarat, selkä' },
   { name: 'Kulmasoutu tangolla',      emoji: '🔙', sets: 3, reps: 10,      rest: 120,
     note: 'levytangolla', muscles: 'Selkä, epäkäs, hauis' },
   { name: 'Ranskalainen punnerrus',   emoji: '🦾', sets: 3, reps: 10,      rest: 90,
     muscles: 'Ojentajat' },
-  { name: 'Maastaveto',               emoji: '🏋️', sets: 4, reps: 5,       rest: 180,
+  { name: 'Maastaveto',               emoji: '🏋️', sets: 3, reps: 5,       rest: 180,
     muscles: 'Selkä, pakarat, takareidet' },
   { name: 'Ylätalja',                 emoji: '⬇️', sets: 3, reps: 10,      rest: 120,
     muscles: 'Selkä, hauis, epäkäs' },
@@ -722,6 +815,10 @@ let currentWorkout        = null;  // { date, exercises:[{name, sets:[{weight,re
 let workoutHistory        = [];    // array of saved workouts
 let selectedExerciseNames = ALL_EXERCISES.map(function(e) { return e.name; }); // default: all
 
+let planA      = null;  // array of exercise names or null
+let planB      = null;  // array of exercise names or null
+let activePlan = null;  // 'A' | 'B' | null
+
 let timerInterval  = null;
 let timerRemaining = 0;
 
@@ -734,12 +831,123 @@ function init() {
   renderHistory();
   renderExerciseSelect();
   updateDate();
+  renderPlanBadge();
 }
 
 function updateDate() {
   const d = new Date();
   document.getElementById('header-date').textContent =
     'Tänään: ' + fmtDate(d) + ' · Treeniohjelma';
+}
+
+// ─────────────────────────────────────────────
+//  PLAN A / B MANAGEMENT
+// ─────────────────────────────────────────────
+function renderPlanBadge() {
+  const bar       = document.getElementById('plan-info-bar');
+  const badge     = document.getElementById('plan-badge');
+  const switchBtn = document.getElementById('plan-switch-btn');
+  if (activePlan && planA && planB) {
+    bar.classList.add('visible');
+    badge.textContent = 'Treeni ' + activePlan;
+    const next = activePlan === 'A' ? 'B' : 'A';
+    switchBtn.textContent = '→ Treeni ' + next;
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+function switchPlan() {
+  if (!planA || !planB) {
+    showToast('⚠️ Tallenna ensin molemmat suunnitelmat ⚙️ Liikkeet-välilehdellä!');
+    return;
+  }
+  const next = activePlan === 'A' ? 'B' : 'A';
+  if (!confirm('Vaihdetaan suunnitelmaan ' + next + '?\n\nNykyinen treeni nollataan.')) return;
+  activePlan = next;
+  selectedExerciseNames = (activePlan === 'A' ? planA : planB).slice();
+  persist();
+  newWorkout(true);
+  stopTimer();
+  renderWorkout();
+  renderPlanBadge();
+  showTab('workout');
+  showToast('🔄 Vaihdettu suunnitelmaan ' + activePlan);
+}
+
+function saveAsPlan(letter) {
+  const sel = pendingSelection !== null ? pendingSelection : selectedExerciseNames;
+  if (sel.length === 0) { showToast('⚠️ Valitse ainakin yksi liike!'); return; }
+  const label = 'Suunnitelma ' + letter;
+  if (!confirm('Tallennetaan nykyinen valinta (' + sel.length + ' liikettä) ' + label + 'ksi?\n\nSuunnitelma aktivoidaan heti.')) return;
+  if (letter === 'A') {
+    planA = sel.slice();
+    activePlan = 'A';
+  } else {
+    planB = sel.slice();
+    activePlan = 'B';
+  }
+  selectedExerciseNames = sel.slice();
+  pendingSelection = null;
+  persist();
+  newWorkout(false);
+  stopTimer();
+  renderWorkout();
+  renderExerciseSelect();
+  renderPlanBadge();
+  showTab('workout');
+  showToast('✅ ' + label + ' tallennettu ja aktivoitu!');
+}
+
+function renderPlanStatus() {
+  const statusEl = document.getElementById('plan-status-text');
+  const activateBtns = document.getElementById('plan-activate-btns');
+  if (!statusEl) return;
+  const aLabel = planA ? ('A: ' + planA.length + ' liikettä') : 'A: ei asetettu';
+  const bLabel = planB ? ('B: ' + planB.length + ' liikettä') : 'B: ei asetettu';
+  statusEl.textContent = aLabel + '  |  ' + bLabel;
+
+  // Active plan highlight
+  const btnA = document.getElementById('plan-save-a');
+  const btnB = document.getElementById('plan-save-b');
+  if (btnA) btnA.classList.toggle('active-plan', activePlan === 'A');
+  if (btnB) btnB.classList.toggle('active-plan', activePlan === 'B');
+
+  // Activate buttons (only shown when both plans exist)
+  if (!activateBtns) return;
+  activateBtns.innerHTML = '';
+  if (planA) {
+    const bA = document.createElement('button');
+    bA.className = 'plan-activate-btn' + (activePlan === 'A' ? ' active-plan' : '');
+    bA.textContent = (activePlan === 'A' ? '✓ Aktiivinen: A' : '▶ Aktivoi A');
+    bA.onclick = function() { activatePlan('A'); };
+    activateBtns.appendChild(bA);
+  }
+  if (planB) {
+    const bB = document.createElement('button');
+    bB.className = 'plan-activate-btn' + (activePlan === 'B' ? ' active-plan' : '');
+    bB.textContent = (activePlan === 'B' ? '✓ Aktiivinen: B' : '▶ Aktivoi B');
+    bB.onclick = function() { activatePlan('B'); };
+    activateBtns.appendChild(bB);
+  }
+}
+
+function activatePlan(letter) {
+  const exercises = letter === 'A' ? planA : planB;
+  if (!exercises) return;
+  if (activePlan === letter) { showToast('📋 Suunnitelma ' + letter + ' on jo aktiivinen'); return; }
+  if (!confirm('Aktivoidaan suunnitelma ' + letter + '?\n\nNykyinen treeni nollataan.')) return;
+  activePlan = letter;
+  selectedExerciseNames = exercises.slice();
+  pendingSelection = null;
+  persist();
+  newWorkout(false);
+  stopTimer();
+  renderWorkout();
+  renderExerciseSelect();
+  renderPlanBadge();
+  showTab('workout');
+  showToast('✅ Suunnitelma ' + letter + ' aktivoitu!');
 }
 
 // ─────────────────────────────────────────────
@@ -758,6 +966,10 @@ function loadData() {
       if (Array.isArray(parsed) && parsed.length > 0) selectedExerciseNames = parsed;
     }
   } catch(e) {}
+
+  try { const p = localStorage.getItem('gs_planA'); if (p) planA = JSON.parse(p); } catch(e) {}
+  try { const p = localStorage.getItem('gs_planB'); if (p) planB = JSON.parse(p); } catch(e) {}
+  try { const p = localStorage.getItem('gs_activePlan'); if (p !== null) activePlan = p || null; } catch(e) {}
 
   try {
     const c = localStorage.getItem('gs_current');
@@ -801,6 +1013,9 @@ function persist() {
   localStorage.setItem('gs_current',  JSON.stringify(currentWorkout));
   localStorage.setItem('gs_history',  JSON.stringify(workoutHistory));
   localStorage.setItem('gs_selected', JSON.stringify(selectedExerciseNames));
+  localStorage.setItem('gs_planA',    JSON.stringify(planA));
+  localStorage.setItem('gs_planB',    JSON.stringify(planB));
+  localStorage.setItem('gs_activePlan', activePlan || '');
 }
 
 function newWorkout(keepWeights) {
@@ -1016,9 +1231,8 @@ function renderExerciseSelect() {
   });
 
   updateExselCount();
+  renderPlanStatus();
 }
-
-// Temporary pending selection (before Apply is pressed)
 let pendingSelection = null;
 
 function toggleExercisePending(name) {
@@ -1224,15 +1438,28 @@ function finishWorkout() {
     return;
   }
 
-  if (!confirm(`Tallennetaan treeni (${done} sarjaa tehty)?\n\nUusi treeni alkaa heti.`)) return;
+  const nextPlan = (activePlan && planA && planB) ? (activePlan === 'A' ? 'B' : 'A') : null;
+  let confirmMsg = `Tallennetaan treeni (${done} sarjaa tehty)?\n\nUusi treeni alkaa heti.`;
+  if (nextPlan) confirmMsg += `\n\nSeuraava treeni: Suunnitelma ${nextPlan} (vaihdetaan automaattisesti).`;
 
+  if (!confirm(confirmMsg)) return;
+
+  if (activePlan) currentWorkout.variant = activePlan;
   workoutHistory.push({ ...currentWorkout, savedAt: new Date().toISOString() });
+
+  if (nextPlan) {
+    activePlan = nextPlan;
+    selectedExerciseNames = (activePlan === 'A' ? planA : planB).slice();
+    persist();
+  }
+
   newWorkout(true);  // start fresh, keep weights pre-filled
   stopTimer();
   renderWorkout();
   renderHistory();
+  renderPlanBadge();
   showTab('workout');
-  showToast('💪 Hyvä treeni! Tallennettu historiaan ✅');
+  showToast('💪 Hyvä treeni! Tallennettu historiaan ✅' + (nextPlan ? ' · Seuraava: Treeni ' + nextPlan : ''));
 }
 
 function resetWorkout() {
@@ -1349,7 +1576,10 @@ function exportBackup() {
     _date:   new Date().toISOString(),
     selectedExerciseNames,
     currentWorkout,
-    workoutHistory
+    workoutHistory,
+    planA,
+    planB,
+    activePlan
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
@@ -1378,11 +1608,15 @@ function importBackup(evt) {
       if (Array.isArray(data.selectedExerciseNames) && data.selectedExerciseNames.length > 0) {
         selectedExerciseNames = data.selectedExerciseNames;
       }
+      if (Array.isArray(data.planA))  planA = data.planA;
+      if (Array.isArray(data.planB))  planB = data.planB;
+      if (data.activePlan)            activePlan = data.activePlan;
       backfillWeights();
       persist();
       renderWorkout();
       renderHistory();
       renderExerciseSelect();
+      renderPlanBadge();
       showToast(`✅ Palautettu! ${workoutHistory.length} treeniä.`);
     } catch (err) {
       alert('❌ Virhe: ' + err.message);
