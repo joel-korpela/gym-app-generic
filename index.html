@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Golden Six">
+  <meta name="apple-mobile-web-app-title" content="Gym Tracker">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#1a1a2e">
-  <meta name="description" content="Arnoldin Golden Six -treeniohjelma – PWA">
-  <title>🏋️ Golden Six</title>
+  <meta name="description" content="Gym Tracker – PWA treeniohjelma">
+  <title>🏋️ Gym Tracker</title>
   <style>
     :root {
       --bg: #1a1a2e;
@@ -473,6 +473,74 @@
     .cloud-info strong { color: var(--text); }
     .cloud-info p { margin-bottom: 4px; }
 
+    /* ── Exercise selection tab ──────────────── */
+    .exsel-wrap { padding: 16px 12px; }
+    .exsel-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .exsel-actions button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--card2);
+      color: var(--text);
+    }
+    .exsel-apply-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: var(--bg);
+      margin-top: 14px;
+    }
+    .exsel-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      background: var(--card);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .exsel-item:active { background: var(--card2); }
+    .exsel-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .exsel-check.checked { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+    .exsel-info { flex: 1; }
+    .exsel-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .exsel-muscles { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .exsel-note { font-size: 11px; color: #4d6a9a; font-style: italic; }
+    .exsel-count {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: right;
+    }
+
     /* ── Empty state ─────────────────────────── */
     .empty {
       text-align: center;
@@ -511,8 +579,8 @@
 
   <!-- Header -->
   <div id="header">
-    <h1>🏋️ Golden Six <span id="variant-badge" class="variant-badge">A</span> <button class="variant-switch-btn" onclick="switchVariant()">A↔B</button></h1>
-    <div class="subtitle" id="header-date">Arnoldin ohjelma · Fullbody 3×/vk</div>
+    <h1>🏋️ Gym Tracker</h1>
+    <div class="subtitle" id="header-date">Treeniohjelma · Fullbody</div>
   </div>
 
   <!-- Timer bar -->
@@ -525,6 +593,7 @@
   <!-- Tabs -->
   <div id="tabs">
     <div class="tab active" data-tab="workout" onclick="showTab('workout')">🏋️ Treeni</div>
+    <div class="tab" data-tab="exercises" onclick="showTab('exercises')">⚙️ Liikkeet</div>
     <div class="tab" data-tab="history" onclick="showTab('history')">📅 Historia</div>
     <div class="tab" data-tab="cloud" onclick="showTab('cloud')">☁️ iCloud</div>
   </div>
@@ -539,6 +608,19 @@
         <div class="progress-label" id="prog-label">0 / 0 sarjaa tehty</div>
       </div>
       <div id="exercises"></div>
+    </div>
+
+    <!-- EXERCISE SELECTION TAB -->
+    <div id="tab-exercises" class="section">
+      <div class="exsel-wrap">
+        <div class="exsel-count" id="exsel-count"></div>
+        <div class="exsel-actions">
+          <button onclick="selectAllExercises()">✅ Valitse kaikki</button>
+          <button onclick="clearAllExercises()">☐ Tyhjennä</button>
+        </div>
+        <div id="exsel-list"></div>
+        <button class="exsel-apply-btn" onclick="applyExerciseSelection()">💪 Käytä valintaa treeniohjelmasssa</button>
+      </div>
     </div>
 
     <!-- HISTORY TAB -->
@@ -593,62 +675,52 @@ function esc(str) {
 }
 
 // ─────────────────────────────────────────────
-//  EXERCISE DEFINITIONS – Golden Six 2020
-//  Exercises 1, 3 and 5 alternate A/B each session
+//  EXERCISE DEFINITIONS – all available exercises
 // ─────────────────────────────────────────────
-const EXERCISE_VARIANTS = {
-  A: [
-    { name: 'Kyykky',                  emoji: '🦵', sets: 4, reps: 10,      rest: 120,
-      muscles: 'Pakarat, etureidet' },
-    { name: 'Penkkipunnerrus',         emoji: '💪', sets: 3, reps: 10,      rest: 120,
-      note: 'leveä ote', muscles: 'Rinta, ojentaja, olkapäät' },
-    { name: 'Leuanveto',               emoji: '🔝', sets: 3, reps: 'max',   rest: 120,
-      note: 'leveä myötäote', muscles: 'Selkä, epäkäs, hauis' },
-    { name: 'Pystypunnerrus',          emoji: '🙌', sets: 3, reps: 10,      rest: 120,
-      muscles: 'Olkapäät, ojentajat' },
-    { name: 'Vipunostot kulmassa',     emoji: '🎯', sets: 1, reps: 12,      rest: 120,
-      note: 'takaolkapäät', muscles: 'Takaolkapäät' },
-    { name: 'Hauiskääntö',             emoji: '💪', sets: 2, reps: 10,      rest: 90,
-      note: 'tangolla, käänteisote', muscles: 'Hauis, brachialis' },
-    { name: 'Hauiskääntö myötäote',    emoji: '🔄', sets: 1, reps: 10,      rest: 90,
-      note: 'brachialis', muscles: 'Brachialis' },
-    { name: 'Vatsalihasliike',         emoji: '🔥', sets: 3, reps: '15-20', rest: 60,
-      note: 'eri liikkeitä', muscles: 'Vatsalihakset' }
-  ],
-  B: [
-    { name: 'Suorin jaloin maastaveto', emoji: '🏋️', sets: 4, reps: 10,      rest: 120,
-      muscles: 'Takareidet, pakarat, selkä' },
-    { name: 'Penkkipunnerrus',          emoji: '💪', sets: 3, reps: 10,      rest: 120,
-      note: 'leveä ote', muscles: 'Rinta, ojentaja, olkapäät' },
-    { name: 'Kulmasoutu',               emoji: '🔙', sets: 3, reps: 10,      rest: 120,
-      note: 'levytangolla', muscles: 'Selkä, epäkäs, hauis' },
-    { name: 'Pystypunnerrus',           emoji: '🙌', sets: 3, reps: 10,      rest: 120,
-      muscles: 'Olkapäät, ojentajat' },
-    { name: 'Vipunostot kulmassa',      emoji: '🎯', sets: 1, reps: 12,      rest: 120,
-      note: 'takaolkapäät', muscles: 'Takaolkapäät' },
-    { name: 'Ranskalainen punnerrus',   emoji: '🦾', sets: 3, reps: 10,      rest: 90,
-      muscles: 'Ojentajat' },
-    { name: 'Vatsalihasliike',          emoji: '🔥', sets: 3, reps: '15-20', rest: 60,
-      note: 'eri liikkeitä', muscles: 'Vatsalihakset' }
-  ]
-};
+const ALL_EXERCISES = [
+  { name: 'Kyykky',                   emoji: '🦵', sets: 4, reps: 10,      rest: 120,
+    muscles: 'Pakarat, etureidet' },
+  { name: 'Penkkipunnerrus',          emoji: '💪', sets: 3, reps: 10,      rest: 120,
+    note: 'leveä ote', muscles: 'Rinta, ojentaja, olkapäät' },
+  { name: 'Leuanveto',                emoji: '🔝', sets: 3, reps: 'max',   rest: 120,
+    note: 'leveä myötäote', muscles: 'Selkä, epäkäs, hauis' },
+  { name: 'Pystypunnerrus',           emoji: '🙌', sets: 3, reps: 10,      rest: 120,
+    muscles: 'Olkapäät, ojentajat' },
+  { name: 'Vipunostot kulmassa',      emoji: '🎯', sets: 1, reps: 12,      rest: 120,
+    note: 'takaolkapäät', muscles: 'Takaolkapäät' },
+  { name: 'Hauiskääntö',              emoji: '💪', sets: 2, reps: 10,      rest: 90,
+    note: 'tangolla, käänteisote', muscles: 'Hauis, brachialis' },
+  { name: 'Hauiskääntö myötäote',     emoji: '🔄', sets: 1, reps: 10,      rest: 90,
+    note: 'brachialis', muscles: 'Brachialis' },
+  { name: 'Vatsalihasliike',          emoji: '🔥', sets: 3, reps: '15-20', rest: 60,
+    note: 'eri liikkeitä', muscles: 'Vatsalihakset' },
+  { name: 'Suorin jaloin maastaveto', emoji: '🏋️', sets: 4, reps: 10,      rest: 120,
+    muscles: 'Takareidet, pakarat, selkä' },
+  { name: 'Kulmasoutu tangolla',      emoji: '🔙', sets: 3, reps: 10,      rest: 120,
+    note: 'levytangolla', muscles: 'Selkä, epäkäs, hauis' },
+  { name: 'Ranskalainen punnerrus',   emoji: '🦾', sets: 3, reps: 10,      rest: 90,
+    muscles: 'Ojentajat' },
+  { name: 'Maastaveto',               emoji: '🏋️', sets: 4, reps: 5,       rest: 180,
+    muscles: 'Selkä, pakarat, takareidet' },
+  { name: 'Ylätalja',                 emoji: '⬇️', sets: 3, reps: 10,      rest: 120,
+    muscles: 'Selkä, hauis, epäkäs' },
+];
 
 function activeExercises() {
-  return EXERCISE_VARIANTS[workoutVariant];
+  return ALL_EXERCISES.filter(function(e) { return selectedExerciseNames.includes(e.name); });
 }
 
 function getExDef(name) {
-  const all = [...EXERCISE_VARIANTS.A, ...EXERCISE_VARIANTS.B];
-  return all.find(function(e) { return e.name === name; }) ||
+  return ALL_EXERCISES.find(function(e) { return e.name === name; }) ||
     { name: name, emoji: '🏋️', sets: 0, reps: 0, rest: 120, note: '', muscles: '' };
 }
 
 // ─────────────────────────────────────────────
 //  STATE
 // ─────────────────────────────────────────────
-let currentWorkout = null;   // { date, variant, exercises:[{name, sets:[{weight,reps,done}]}] }
-let workoutHistory  = [];    // array of saved workouts
-let workoutVariant  = 'A';   // 'A' or 'B', alternates each saved workout
+let currentWorkout        = null;  // { date, exercises:[{name, sets:[{weight,reps,done}]}] }
+let workoutHistory        = [];    // array of saved workouts
+let selectedExerciseNames = ALL_EXERCISES.map(function(e) { return e.name; }); // default: all
 
 let timerInterval  = null;
 let timerRemaining = 0;
@@ -660,13 +732,14 @@ function init() {
   loadData();
   renderWorkout();
   renderHistory();
+  renderExerciseSelect();
   updateDate();
 }
 
 function updateDate() {
   const d = new Date();
   document.getElementById('header-date').textContent =
-    'Tänään: ' + fmtDate(d) + ' · Arnoldin ohjelma 2020';
+    'Tänään: ' + fmtDate(d) + ' · Treeniohjelma';
 }
 
 // ─────────────────────────────────────────────
@@ -679,17 +752,17 @@ function loadData() {
   } catch(e) { workoutHistory = []; }
 
   try {
-    const v = localStorage.getItem('gs_variant');
-    if (v === 'A' || v === 'B') workoutVariant = v;
+    const sel = localStorage.getItem('gs_selected');
+    if (sel) {
+      const parsed = JSON.parse(sel);
+      if (Array.isArray(parsed) && parsed.length > 0) selectedExerciseNames = parsed;
+    }
   } catch(e) {}
 
   try {
     const c = localStorage.getItem('gs_current');
     if (c) {
       currentWorkout = JSON.parse(c);
-      if (currentWorkout.variant === 'A' || currentWorkout.variant === 'B') {
-        workoutVariant = currentWorkout.variant;
-      }
       backfillWeights();
     } else {
       newWorkout();
@@ -727,15 +800,15 @@ function backfillWeights() {
 function persist() {
   localStorage.setItem('gs_current',  JSON.stringify(currentWorkout));
   localStorage.setItem('gs_history',  JSON.stringify(workoutHistory));
-  localStorage.setItem('gs_variant',  workoutVariant);
+  localStorage.setItem('gs_selected', JSON.stringify(selectedExerciseNames));
 }
 
 function newWorkout(keepWeights) {
-  // Toggle variant only when starting a fresh workout after saving
-  if (keepWeights) {
-    workoutVariant = workoutVariant === 'A' ? 'B' : 'A';
-  }
   const exDefs = activeExercises();
+  if (exDefs.length === 0) {
+    showToast('⚠️ Valitse ensin liikkeet ⚙️ Liikkeet -välilehdeltä!');
+    return;
+  }
 
   // Build previous weights per exercise name (search full history, newest first)
   const prevWeightsByName = {};
@@ -752,7 +825,6 @@ function newWorkout(keepWeights) {
 
   currentWorkout = {
     date:     new Date().toISOString(),
-    variant:  workoutVariant,
     exercises: exDefs.map(function(ex, i) {
       return {
         name: ex.name,
@@ -777,11 +849,12 @@ function renderWorkout() {
   const container = document.getElementById('exercises');
   container.innerHTML = '';
 
-  // Update variant badge in header
-  const badge = document.getElementById('variant-badge');
-  if (badge) badge.textContent = workoutVariant;
-
   const exDefs = activeExercises();
+  if (exDefs.length === 0) {
+    container.innerHTML = '<div class="empty">⚙️ Ei valittuja liikkeitä.<br><br>Siirry <strong>Liikkeet</strong>-välilehdelle ja valitse treeniohjelmaasi liikkeet! 💪</div>';
+    updateProgress();
+    return;
+  }
 
   // Build a lookup of last weights per exercise name from history
   const prevWeightsByName = {};
@@ -888,7 +961,7 @@ function updateProgress() {
   const pct = total ? (done / total * 100) : 0;
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-label').textContent =
-    'Treeni ' + workoutVariant + ' · ' + done + ' / ' + total + ' sarjaa tehty';
+    done + ' / ' + total + ' sarjaa tehty';
 }
 
 // ─────────────────────────────────────────────
@@ -913,14 +986,96 @@ function adjustWeight(ei, si, delta) {
   if (inp) inp.value = nextStr;
 }
 
-function switchVariant() {
-  const next = workoutVariant === 'A' ? 'B' : 'A';
-  if (!confirm('Vaihdetaan treeni ' + next + '?\nNykyiset rastit nollataan.')) return;
-  workoutVariant = next;
+// ─────────────────────────────────────────────
+//  EXERCISE SELECTION
+// ─────────────────────────────────────────────
+function renderExerciseSelect() {
+  const list = document.getElementById('exsel-list');
+  const countEl = document.getElementById('exsel-count');
+  list.innerHTML = '';
+
+  ALL_EXERCISES.forEach(function(ex) {
+    const checked = selectedExerciseNames.includes(ex.name);
+    const item = document.createElement('div');
+    item.className = 'exsel-item';
+    item.setAttribute('onclick', 'toggleExercisePending(\'' + esc(ex.name) + '\')');
+    item.id = 'exsel-' + ex.name.replace(/\s+/g, '_');
+
+    const noteHtml = ex.note ? '<div class="exsel-note">(' + esc(ex.note) + ')</div>' : '';
+    item.innerHTML =
+      '<div class="exsel-check' + (checked ? ' checked' : '') + '" id="check-' + ex.name.replace(/\s+/g, '_') + '">' +
+        (checked ? '✓' : '') +
+      '</div>' +
+      '<div class="exsel-info">' +
+        '<div class="exsel-name">' + ex.emoji + ' ' + esc(ex.name) + '</div>' +
+        (ex.muscles ? '<div class="exsel-muscles">' + esc(ex.muscles) + '</div>' : '') +
+        noteHtml +
+      '</div>';
+    list.appendChild(item);
+  });
+
+  updateExselCount();
+}
+
+// Temporary pending selection (before Apply is pressed)
+let pendingSelection = null;
+
+function toggleExercisePending(name) {
+  if (!pendingSelection) pendingSelection = selectedExerciseNames.slice();
+  const idx = pendingSelection.indexOf(name);
+  if (idx === -1) {
+    pendingSelection.push(name);
+  } else {
+    pendingSelection.splice(idx, 1);
+  }
+  const key = name.replace(/\s+/g, '_');
+  const checkEl = document.getElementById('check-' + key);
+  if (checkEl) {
+    const isChecked = pendingSelection.includes(name);
+    checkEl.className = 'exsel-check' + (isChecked ? ' checked' : '');
+    checkEl.textContent = isChecked ? '✓' : '';
+  }
+  updateExselCount();
+}
+
+function updateExselCount() {
+  const sel = pendingSelection || selectedExerciseNames;
+  const countEl = document.getElementById('exsel-count');
+  if (countEl) countEl.textContent = sel.length + ' / ' + ALL_EXERCISES.length + ' liikettä valittu';
+}
+
+function selectAllExercises() {
+  pendingSelection = ALL_EXERCISES.map(function(e) { return e.name; });
+  renderExerciseSelect();
+  pendingSelection = ALL_EXERCISES.map(function(e) { return e.name; });
+  updateExselCount();
+}
+
+function clearAllExercises() {
+  pendingSelection = [];
+  renderExerciseSelect();
+  pendingSelection = [];
+  updateExselCount();
+}
+
+function applyExerciseSelection() {
+  const sel = pendingSelection !== null ? pendingSelection : selectedExerciseNames;
+  if (sel.length === 0) {
+    showToast('⚠️ Valitse ainakin yksi liike!');
+    return;
+  }
+  selectedExerciseNames = sel.slice();
+  pendingSelection = null;
+  persist();
+  if (!confirm('Otetaan uusi liikevalikoima käyttöön? Nykyiset rastit nollataan.')) {
+    return;
+  }
   newWorkout(false);
   stopTimer();
   renderWorkout();
-  showToast('🔄 Vaihdettu treeni ' + workoutVariant);
+  renderExerciseSelect();
+  showTab('workout');
+  showToast('✅ Liikevalikoima päivitetty!');
 }
 
 function toggleSet(ei, si) {
@@ -1192,10 +1347,10 @@ function clearAllHistory() {
 // ─────────────────────────────────────────────
 function exportBackup() {
   const payload = {
-    _app:    'Golden Six PWA',
-    _ver:    2,
+    _app:    'Gym Tracker PWA',
+    _ver:    3,
     _date:   new Date().toISOString(),
-    workoutVariant,
+    selectedExerciseNames,
     currentWorkout,
     workoutHistory
   };
@@ -1203,7 +1358,7 @@ function exportBackup() {
   const url  = URL.createObjectURL(blob);
   const a    = Object.assign(document.createElement('a'), {
     href:     url,
-    download: `golden-six-${fmtDateFile(new Date())}.json`
+    download: `gym-tracker-${fmtDateFile(new Date())}.json`
   });
   document.body.appendChild(a);
   a.click();
@@ -1223,13 +1378,14 @@ function importBackup(evt) {
       if (!confirm(`Palautetaan varmuuskopio?\n${data.workoutHistory.length} treeniä historiassa.\n\nNykyinen data ylikirjoitetaan.`)) return;
       currentWorkout = data.currentWorkout;
       workoutHistory = data.workoutHistory;
-      if (data.workoutVariant === 'A' || data.workoutVariant === 'B') {
-        workoutVariant = data.workoutVariant;
+      if (Array.isArray(data.selectedExerciseNames) && data.selectedExerciseNames.length > 0) {
+        selectedExerciseNames = data.selectedExerciseNames;
       }
       backfillWeights();
       persist();
       renderWorkout();
       renderHistory();
+      renderExerciseSelect();
       showToast(`✅ Palautettu! ${workoutHistory.length} treeniä.`);
     } catch (err) {
       alert('❌ Virhe: ' + err.message);
@@ -1250,6 +1406,10 @@ function showTab(name) {
   const bar = document.getElementById('action-bar');
   if (name === 'workout') bar.classList.remove('hidden');
   else bar.classList.add('hidden');
+  if (name === 'exercises') {
+    pendingSelection = null;
+    renderExerciseSelect();
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -1282,7 +1442,7 @@ function showToast(msg) {
 function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   const swSrc = `
-const CACHE = 'golden-six-v2';
+const CACHE = 'gym-tracker-v1';
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c => c.addAll(['./']))
