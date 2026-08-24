@@ -1101,8 +1101,6 @@ function renderWorkout() {
 
     const noteHtml    = def.note    ? ' <span class="ex-note">(' + def.note + ')</span>'  : '';
     const musclesHtml = def.muscles ? '<div class="ex-muscles">💪 ' + def.muscles + '</div>' : '';
-    const repsLabel   = def.reps === 'max' ? 'max toistoa' : (def.reps + ' toistoa');
-
     const allDone = ex.sets.every(function(s) { return s.done; });
     const markAllBtnHtml = allDone ? '' :
       '<button class="mark-all-btn" onclick="markAllDone(' + ei + ')">✓ Kaikki tehty</button>';
@@ -1114,7 +1112,6 @@ function renderWorkout() {
       '<div class="ex-head">' +
         '<div>' +
           '<div class="ex-name">' + def.emoji + ' ' + def.name + noteHtml + '</div>' +
-          '<div class="ex-meta">' + def.sets + ' sarjaa × ' + repsLabel + '</div>' +
           musclesHtml +
         '</div>' +
         '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' +
