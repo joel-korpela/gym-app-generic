@@ -1,13 +1,13 @@
-# 🏋️ Golden Six – PWA-treeniappi
+# 🏋️ Gym Tracker – PWA-treeniappi
 
-Arnoldin Golden Six -treeniohjelma iPhonelle. Toimii täysin offline-tilassa ja tallentaa tiedot puhelimen muistiin.
+Geneerinen kuntosalin treeniohjelmaseuranta iPhonelle. Toimii täysin offline-tilassa ja tallentaa tiedot puhelimen muistiin.
 
 ---
 
 ## 📱 Asennus iPhoneen (2 min)
 
 1. **Avaa Safari** iPhonessa *(ei Chrome tai Firefox!)*
-2. Mene appin osoitteeseen: **https://joel-korpela.github.io/golden-six-app/**
+2. Mene appin osoitteeseen: **https://joel-korpela.github.io/gym-app-generic/**
 3. Paina **Jaa-painike** (neliö, jossa ylöspäin osoittava nuoli) ↑
 4. Selaa alaspäin ja valitse **"Lisää Koti-valikkoon"**
 5. Paina **"Lisää"** oikeassa yläkulmassa
@@ -17,32 +17,30 @@ Arnoldin Golden Six -treeniohjelma iPhonelle. Toimii täysin offline-tilassa ja 
 
 ## ✅ Ominaisuudet
 
-- **Arnoldin Golden Six 2020** – fullbody-ohjelma, 3 × viikossa
-- Liikkeet 1, 3 ja 5 vaihtuvat **A/B-vuorottelulla** joka treenissä
-- **Treeni A:**
-  - 1️⃣ Kyykky – 4 × 10 *(pakarat, etureidet)*
-  - 2️⃣ Penkkipunnerrus – 3 × 10 *(rinta, ojentaja, olkapäät)*
-  - 3️⃣ Leuanveto, leveä myötäote – 3 × max *(selkä, hauis)*
-  - 4️⃣ Pystypunnerrus – 3 × 10 + Vipunostot kulmassa 1 × 12 *(olkapäät, takaolkapäät)*
-  - 5️⃣ Hauiskääntö – 2 × 10 + myötäote 1 × 10 *(hauis, brachialis)*
-  - 6️⃣ Vatsalihasliike – 3 × 15–20
-- **Treeni B:**
-  - 1️⃣ Suorin jaloin maastaveto – 4 × 10 *(takareidet, pakarat, selkä)*
-  - 2️⃣ Penkkipunnerrus – 3 × 10
-  - 3️⃣ Kulmasoutu levytangolla – 3 × 10 *(selkä, epäkäs, hauis)*
-  - 4️⃣ Pystypunnerrus – 3 × 10 + Vipunostot kulmassa 1 × 12
-  - 5️⃣ Ranskalainen punnerrus – 3 × 10 *(ojentajat)*
-  - 6️⃣ Vatsalihasliike – 3 × 15–20
+- ⚙️ **Täysin mukautettava treeniohjelma** – valitse haluamasi liikkeet kirjastosta
+- 📋 **A/B-suunnitelmat** – tallenna kaksi eri treenipohjaa ja vaihda niiden välillä
 - ✅ Rastita sarjat tehdyksi
 - 📊 Kirjaa paino (kg) ja toistot jokaiselle sarjalle
-- ⏱️ Automaattinen palautusajastin (2 min / 1,5 min liikkeelle 5 / 1 min vatsaliikkeille)
+- ⏱️ Automaattinen palautusajastin sarjojen väliin (per liike konfiguroitu)
 - 🔔 Ajastin hälyttää ääni + värinällä kun palautus on ohi
-- 📅 Treenihistoria päivämäärän ja A/B-variantin kera
+- 📅 Treenihistoria päivämäärän kera
 - 📈 Edellisen treenin painot näkyvät viitteenä per liike
 - 💪 Treenattavat lihakset näkyvät jokaisella liikekortilla
 - ☁️ iCloud-varmuuskopiointi (lataa/palauta JSON-tiedosto)
 - 💾 Kaikki data tallennetaan vain omalle puhelimellesi (localStorage)
 - 🌐 Toimii täysin offline-tilassa – ei vaadi internetiä
+
+---
+
+## ⚙️ Liikkeet ja suunnitelmat
+
+Avaa **⚙️ Liikkeet** -välilehti appissa ja:
+
+1. Valitse haluamasi liikkeet saatavilla olevasta kirjastosta
+2. Tallenna valinta **Suunnitelma A**:ksi tai **Suunnitelma B**:ksi
+3. Vaihda aktiivista suunnitelmaa milloin tahansa treenin aikana
+
+Saatavilla olevia liikkeitä ovat mm. kyykky, penkkipunnerrus, leuanveto, pystypunnerrus, hauiskääntö, maastaveto, kulmasoutu ja monet muut.
 
 ---
 
@@ -69,7 +67,7 @@ Jotta appin osoite toimii, GitHub Pages täytyy ottaa käyttöön repositoriossa
 4. Valitse **Source**: `Deploy from a branch`
 5. Valitse **Branch**: `main` ja hakemistoksi `/ (root)`
 6. Paina **Save**
-7. Odota noin minuutti – sivu on sitten saatavilla osoitteessa **https://joel-korpela.github.io/golden-six-app/**
+7. Odota noin minuutti – sivu on sitten saatavilla osoitteessa **https://joel-korpela.github.io/gym-app-generic/**
 
 ---
 
