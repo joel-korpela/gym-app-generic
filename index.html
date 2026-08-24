@@ -779,6 +779,12 @@
             <button class="plan-save-btn" id="plan-save-b" onclick="saveAsPlan('B')">💾 Tallenna suunnitelmana B</button>
           </div>
           <div class="plan-btns" style="margin-top:8px" id="plan-activate-btns"></div>
+          <div class="plan-btns" style="margin-top:8px">
+            <label style="display:flex;align-items:center;gap:8px;font-size:0.9em;cursor:pointer;">
+              <input type="checkbox" id="single-plan-toggle" onchange="toggleSinglePlanMode(this.checked)">
+              🔒 Yhden suunnitelman tila (ei automaattista vaihtoa)
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -882,9 +888,10 @@ let currentWorkout        = null;  // { date, exercises:[{name, sets:[{weight,re
 let workoutHistory        = [];    // array of saved workouts
 let selectedExerciseNames = ALL_EXERCISES.map(function(e) { return e.name; }); // default: all
 
-let planA      = null;  // array of exercise names or null
-let planB      = null;  // array of exercise names or null
-let activePlan = null;  // 'A' | 'B' | null
+let planA          = null;  // array of exercise names or null
+let planB          = null;  // array of exercise names or null
+let activePlan     = null;  // 'A' | 'B' | null
+let singlePlanMode = false; // when true, auto-switch is disabled
 
 let timerInterval  = null;
 let timerRemaining = 0;
@@ -917,7 +924,7 @@ function renderPlanBadge() {
   if (activePlan) {
     bar.classList.add('visible');
     badge.textContent = 'Treeni ' + activePlan;
-    if (planA && planB) {
+    if (planA && planB && !singlePlanMode) {
       const next = activePlan === 'A' ? 'B' : 'A';
       switchBtn.textContent = '→ Treeni ' + next;
       switchBtn.style.display = '';
@@ -946,6 +953,13 @@ function switchPlan() {
   renderPlanBadge();
   showTab('workout');
   showToast('🔄 Vaihdettu suunnitelmaan ' + activePlan);
+}
+
+function toggleSinglePlanMode(enabled) {
+  singlePlanMode = enabled;
+  persist();
+  renderPlanBadge();
+  showToast(enabled ? '🔒 Yhden suunnitelman tila päällä' : '🔄 A/B-vuorottelu päällä');
 }
 
 function saveAsPlan(letter) {
@@ -979,6 +993,10 @@ function renderPlanStatus() {
   const aLabel = planA ? ('A: ' + planA.length + ' liikettä') : 'A: ei asetettu';
   const bLabel = planB ? ('B: ' + planB.length + ' liikettä') : 'B: ei asetettu';
   statusEl.textContent = aLabel + '  |  ' + bLabel;
+
+  // Sync single plan mode checkbox
+  const toggle = document.getElementById('single-plan-toggle');
+  if (toggle) toggle.checked = singlePlanMode;
 
   // Active plan highlight
   const btnA = document.getElementById('plan-save-a');
@@ -1043,6 +1061,7 @@ function loadData() {
   try { const p = localStorage.getItem('gs_planA'); if (p) planA = JSON.parse(p); } catch(e) {}
   try { const p = localStorage.getItem('gs_planB'); if (p) planB = JSON.parse(p); } catch(e) {}
   try { const p = localStorage.getItem('gs_activePlan'); if (p !== null) activePlan = p || null; } catch(e) {}
+  try { const p = localStorage.getItem('gs_singlePlanMode'); if (p !== null) singlePlanMode = p === 'true'; } catch(e) {}
 
   try {
     const c = localStorage.getItem('gs_current');
@@ -1086,9 +1105,10 @@ function persist() {
   localStorage.setItem('gs_current',  JSON.stringify(currentWorkout));
   localStorage.setItem('gs_history',  JSON.stringify(workoutHistory));
   localStorage.setItem('gs_selected', JSON.stringify(selectedExerciseNames));
-  localStorage.setItem('gs_planA',    JSON.stringify(planA));
-  localStorage.setItem('gs_planB',    JSON.stringify(planB));
-  localStorage.setItem('gs_activePlan', activePlan || '');
+  localStorage.setItem('gs_planA',         JSON.stringify(planA));
+  localStorage.setItem('gs_planB',         JSON.stringify(planB));
+  localStorage.setItem('gs_activePlan',    activePlan || '');
+  localStorage.setItem('gs_singlePlanMode', String(singlePlanMode));
 }
 
 function newWorkout(keepWeights) {
@@ -1534,7 +1554,7 @@ function finishWorkout() {
     return;
   }
 
-  const nextPlan = (activePlan && planA && planB) ? (activePlan === 'A' ? 'B' : 'A') : null;
+  const nextPlan = (activePlan && planA && planB && !singlePlanMode) ? (activePlan === 'A' ? 'B' : 'A') : null;
   let confirmMsg = `Tallennetaan treeni (${done} sarjaa tehty)?\n\nUusi treeni alkaa heti.`;
   if (nextPlan) confirmMsg += `\n\nSeuraava treeni: Suunnitelma ${nextPlan} (vaihdetaan automaattisesti).`;
 
@@ -1675,7 +1695,8 @@ function exportBackup() {
     workoutHistory,
     planA,
     planB,
-    activePlan
+    activePlan,
+    singlePlanMode
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
@@ -1707,6 +1728,7 @@ function importBackup(evt) {
       if (Array.isArray(data.planA))  planA = data.planA;
       if (Array.isArray(data.planB))  planB = data.planB;
       if (data.activePlan)            activePlan = data.activePlan;
+      if (typeof data.singlePlanMode === 'boolean') singlePlanMode = data.singlePlanMode;
       backfillWeights();
       persist();
       renderWorkout();
