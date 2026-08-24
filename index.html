@@ -709,7 +709,7 @@
   <!-- Header -->
   <div id="header">
     <h1>🏋️ Gym Tracker</h1>
-    <div class="subtitle" id="header-date">Treeniohjelma · Fullbody</div>
+    <div class="subtitle" id="header-date"></div>
     <div id="plan-info-bar">
       <span id="plan-badge">Treeni A</span>
       <button id="plan-switch-btn" onclick="switchPlan()">→ Treeni B</button>
@@ -904,7 +904,7 @@ function init() {
 function updateDate() {
   const d = new Date();
   document.getElementById('header-date').textContent =
-    'Tänään: ' + fmtDate(d) + ' · Treeniohjelma';
+    'Tänään: ' + fmtDate(d);
 }
 
 // ─────────────────────────────────────────────
