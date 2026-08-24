@@ -619,7 +619,7 @@
           <button onclick="clearAllExercises()">☐ Tyhjennä</button>
         </div>
         <div id="exsel-list"></div>
-        <button class="exsel-apply-btn" onclick="applyExerciseSelection()">💪 Käytä valintaa treeniohjelmasssa</button>
+        <button class="exsel-apply-btn" onclick="applyExerciseSelection()">💪 Käytä valintaa treeniohjelmaassasi</button>
       </div>
     </div>
 
@@ -991,11 +991,12 @@ function adjustWeight(ei, si, delta) {
 // ─────────────────────────────────────────────
 function renderExerciseSelect() {
   const list = document.getElementById('exsel-list');
-  const countEl = document.getElementById('exsel-count');
   list.innerHTML = '';
 
+  const currentSel = pendingSelection !== null ? pendingSelection : selectedExerciseNames;
+
   ALL_EXERCISES.forEach(function(ex) {
-    const checked = selectedExerciseNames.includes(ex.name);
+    const checked = currentSel.includes(ex.name);
     const item = document.createElement('div');
     item.className = 'exsel-item';
     item.setAttribute('onclick', 'toggleExercisePending(\'' + esc(ex.name) + '\')');
@@ -1039,7 +1040,7 @@ function toggleExercisePending(name) {
 }
 
 function updateExselCount() {
-  const sel = pendingSelection || selectedExerciseNames;
+  const sel = pendingSelection !== null ? pendingSelection : selectedExerciseNames;
   const countEl = document.getElementById('exsel-count');
   if (countEl) countEl.textContent = sel.length + ' / ' + ALL_EXERCISES.length + ' liikettä valittu';
 }
@@ -1047,15 +1048,11 @@ function updateExselCount() {
 function selectAllExercises() {
   pendingSelection = ALL_EXERCISES.map(function(e) { return e.name; });
   renderExerciseSelect();
-  pendingSelection = ALL_EXERCISES.map(function(e) { return e.name; });
-  updateExselCount();
 }
 
 function clearAllExercises() {
   pendingSelection = [];
   renderExerciseSelect();
-  pendingSelection = [];
-  updateExselCount();
 }
 
 function applyExerciseSelection() {
@@ -1064,12 +1061,12 @@ function applyExerciseSelection() {
     showToast('⚠️ Valitse ainakin yksi liike!');
     return;
   }
-  selectedExerciseNames = sel.slice();
-  pendingSelection = null;
-  persist();
   if (!confirm('Otetaan uusi liikevalikoima käyttöön? Nykyiset rastit nollataan.')) {
     return;
   }
+  selectedExerciseNames = sel.slice();
+  pendingSelection = null;
+  persist();
   newWorkout(false);
   stopTimer();
   renderWorkout();
