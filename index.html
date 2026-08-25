@@ -670,6 +670,26 @@
       flex-shrink: 0;
     }
 
+    /* ── Add set button ──────────────────────── */
+    .add-set-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: calc(100% - 24px);
+      margin: 8px 12px 10px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1.5px dashed var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .add-set-btn:active { border-color: var(--accent); color: var(--accent); }
+
     /* ── Empty state ─────────────────────────── */
     .empty {
       text-align: center;
@@ -1201,16 +1221,14 @@ function renderWorkout() {
     const card = document.createElement('div');
     card.className = 'ex-card';
     card.id = 'card-' + ei;
+    const rightContent = prevHtml + markAllBtnHtml;
     card.innerHTML =
       '<div class="ex-head">' +
         '<div>' +
           '<div class="ex-name">' + def.emoji + ' ' + def.name + noteHtml + '</div>' +
           musclesHtml +
         '</div>' +
-        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' +
-          (prevHtml ? prevHtml : '') +
-          markAllBtnHtml +
-        '</div>' +
+        (rightContent ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' + rightContent + '</div>' : '') +
       '</div>';
 
     ex.sets.forEach(function(set, si) {
@@ -1252,6 +1270,12 @@ function renderWorkout() {
       card.appendChild(row);
     });
 
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-set-btn';
+    addBtn.textContent = '+ Lisää sarja';
+    addBtn.setAttribute('onclick', 'addSet(' + ei + ')');
+    card.appendChild(addBtn);
+
     container.appendChild(card);
   });
 
@@ -1272,6 +1296,14 @@ function updateProgress() {
 // ─────────────────────────────────────────────
 //  SET INTERACTIONS
 // ─────────────────────────────────────────────
+function addSet(ei) {
+  const ex = currentWorkout.exercises[ei];
+  const lastSet = ex.sets[ex.sets.length - 1];
+  ex.sets.push({ weight: lastSet ? lastSet.weight : '', reps: '', done: false });
+  persist();
+  renderWorkout();
+}
+
 function updSet(ei, si, field, val) {
   currentWorkout.exercises[ei].sets[si][field] = val;
   persist();
