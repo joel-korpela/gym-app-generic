@@ -79,50 +79,91 @@
       --danger: #e05252;
     }
     [data-theme="evangelion"] {
-      --bg: #12062a;
-      --card: #1e0d42;
-      --card2: #2a1258;
-      --deep: #08031a;
+      --bg: transparent;
+      --card: rgba(30, 13, 66, 0.82);
+      --card2: rgba(42, 18, 88, 0.82);
+      --deep: rgba(8, 3, 26, 0.90);
       --accent: #e8003d;
       --accent-dim: #b5002f;
-      --blue: #3a1a6e;
+      --blue: rgba(58, 26, 110, 0.75);
       --text: #e8d0ff;
       --muted: #9a70cc;
       --border: #4a1a8a;
       --danger: #ff2255;
     }
+    [data-theme="evangelion"] body {
+      background-image: url('images/evangelion.jpg');
+      background-size: cover;
+      background-position: center top;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
     [data-theme="soft-anime"] {
-      --bg: #f0ede6;
-      --card: #e6e1d8;
-      --card2: #dbd4c9;
-      --deep: #f8f6f2;
+      --bg: transparent;
+      --card: rgba(230, 225, 216, 0.82);
+      --card2: rgba(219, 212, 201, 0.82);
+      --deep: rgba(248, 246, 242, 0.88);
       --accent: #5ab87a;
       --accent-dim: #3d9960;
-      --blue: #c9dfd0;
+      --blue: rgba(201, 223, 208, 0.75);
       --text: #2e2a25;
       --muted: #7a7060;
       --border: #c0b8aa;
       --danger: #e05252;
     }
+    [data-theme="soft-anime"] body {
+      background-image: url('images/soft-anime.jpg');
+      background-size: cover;
+      background-position: center top;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
     [data-theme="conquer"] {
-      --bg: #1a1a1a;
-      --card: #262626;
-      --card2: #303030;
-      --deep: #0d0d0d;
+      --bg: transparent;
+      --card: rgba(26, 26, 26, 0.80);
+      --card2: rgba(38, 38, 38, 0.80);
+      --deep: rgba(13, 13, 13, 0.88);
       --accent: #f5f5f5;
       --accent-dim: #b0b0b0;
-      --blue: #3a3a3a;
+      --blue: rgba(58, 58, 58, 0.75);
       --text: #f0f0f0;
       --muted: #808080;
       --border: #4a4a4a;
       --danger: #cc3333;
+    }
+    [data-theme="conquer"] body {
+      background-image: url('images/conquer.jpg');
+      background-size: cover;
+      background-position: center top;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+    [data-theme="vegeta"] {
+      --bg: transparent;
+      --card: rgba(10, 5, 30, 0.80);
+      --card2: rgba(20, 10, 50, 0.80);
+      --deep: rgba(5, 2, 15, 0.90);
+      --accent: #f5c400;
+      --accent-dim: #c49a00;
+      --blue: rgba(30, 15, 70, 0.75);
+      --text: #fff5cc;
+      --muted: #b8a060;
+      --border: #5a4000;
+      --danger: #ff3300;
+    }
+    [data-theme="vegeta"] body {
+      background-image: url('images/vegeta.jpg');
+      background-size: cover;
+      background-position: center top;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     html, body {
       height: 100%;
-      background: var(--bg);
+      background-color: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
       font-size: 16px;
@@ -827,7 +868,7 @@
       justify-content: center;
       gap: 6px;
       width: calc(100% - 24px);
-      margin: 8px 12px 10px;
+      margin: 8px 12px 4px;
       padding: 10px;
       border-radius: 10px;
       border: 1.5px dashed var(--border);
@@ -1087,7 +1128,8 @@ const THEMES = [
   { id: 'ocean',       label: '🌊 Ocean',        bg: '#0d1a2e', accent: '#00d4ff' },
   { id: 'evangelion', label: '🔴 Evangelion',    bg: '#12062a', accent: '#e8003d' },
   { id: 'soft-anime', label: '🍃 Soft Anime',    bg: '#f0ede6', accent: '#5ab87a' },
-  { id: 'conquer',    label: '🏆 Conquer',       bg: '#1a1a1a', accent: '#f5f5f5' }
+  { id: 'conquer',    label: '🏆 Conquer',       bg: '#1a1a1a', accent: '#f5f5f5' },
+  { id: 'vegeta',     label: '⚡ Vegeta',        bg: '#0a051e', accent: '#f5c400' }
 ];
 
 function applyTheme(id) {
