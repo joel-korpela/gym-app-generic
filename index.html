@@ -138,6 +138,26 @@
       background-attachment: fixed;
       background-repeat: no-repeat;
     }
+    [data-theme="vegeta"] {
+      --bg: transparent;
+      --card: rgba(10, 5, 30, 0.80);
+      --card2: rgba(20, 10, 50, 0.80);
+      --deep: rgba(5, 2, 15, 0.90);
+      --accent: #f5c400;
+      --accent-dim: #c49a00;
+      --blue: rgba(30, 15, 70, 0.75);
+      --text: #fff5cc;
+      --muted: #b8a060;
+      --border: #5a4000;
+      --danger: #ff3300;
+    }
+    [data-theme="vegeta"] body {
+      background-image: url('https://github.com/user-attachments/assets/97e0cf27-04cb-451e-b9c8-3c002a386ec3');
+      background-size: cover;
+      background-position: center top;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -1108,7 +1128,8 @@ const THEMES = [
   { id: 'ocean',       label: '🌊 Ocean',        bg: '#0d1a2e', accent: '#00d4ff' },
   { id: 'evangelion', label: '🔴 Evangelion',    bg: '#12062a', accent: '#e8003d' },
   { id: 'soft-anime', label: '🍃 Soft Anime',    bg: '#f0ede6', accent: '#5ab87a' },
-  { id: 'conquer',    label: '🏆 Conquer',       bg: '#1a1a1a', accent: '#f5f5f5' }
+  { id: 'conquer',    label: '🏆 Conquer',       bg: '#1a1a1a', accent: '#f5f5f5' },
+  { id: 'vegeta',     label: '⚡ Vegeta',        bg: '#0a051e', accent: '#f5c400' }
 ];
 
 function applyTheme(id) {
