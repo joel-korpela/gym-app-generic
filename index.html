@@ -416,21 +416,42 @@
       border: 2px solid var(--border);
       background: transparent;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 18px;
       font-weight: 700;
       flex-shrink: 0;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px 10px;
-      white-space: nowrap;
+      width: 44px;
+      height: 44px;
+      padding: 0;
       transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
     .check-btn.checked {
       background: var(--accent);
       border-color: var(--accent);
       color: var(--bg);
+    }
+
+    /* ── Easy flag button ────────────────────── */
+    .easy-btn {
+      background: transparent;
+      border: 1.5px solid #555;
+      color: #888;
+      font-size: 13px;
+      padding: 2px 7px;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1.4;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .easy-btn.flagged {
+      background: #1a3a1a;
+      border-color: #4caf50;
+      color: #4caf50;
     }
 
     /* ── Weight adjust buttons ───────────────── */
@@ -1473,11 +1494,15 @@ function renderWorkout() {
     card.className = 'ex-card';
     card.id = 'card-' + ei;
     const rightContent = prevHtml + markAllBtnHtml;
+    const easyFlagged = ex.easy ? ' flagged' : '';
     card.innerHTML =
       '<div class="ex-head">' +
-        '<div>' +
-          '<div class="ex-name">' + def.emoji + ' ' + def.name + noteHtml + '</div>' +
-          musclesHtml +
+        '<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">' +
+          '<div>' +
+            '<div class="ex-name">' + def.emoji + ' ' + def.name + noteHtml + '</div>' +
+            musclesHtml +
+          '</div>' +
+          '<button class="easy-btn' + easyFlagged + '" onclick="toggleEasy(' + ei + ')" title="Sarja tuntui kevyeltä – lisää painoa seuraavalla kerralla">↑kg</button>' +
         '</div>' +
         (rightContent ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' + rightContent + '</div>' : '') +
       '</div>';
@@ -1517,7 +1542,7 @@ function renderWorkout() {
           '</div>' +
         '</div>' +
         '<button class="check-btn' + (set.done ? ' checked' : '') + '"' +
-        ' onclick="toggleSet(' + ei + ',' + si + ')">' + (set.done ? '✓ Tehty' : '✓ Sarja tehty') + '</button>' +
+        ' onclick="toggleSet(' + ei + ',' + si + ')">✓</button>' +
         '<button class="remove-set-btn" onclick="removeSet(' + ei + ',' + si + ')" title="Poista sarja">✕</button>';
       card.appendChild(row);
     });
@@ -1725,7 +1750,6 @@ function toggleSet(ei, si) {
   row.querySelectorAll('.weight-adj').forEach(function(b) { b.disabled = set.done; });
   const btn = row.querySelector('.check-btn');
   btn.className = 'check-btn' + (set.done ? ' checked' : '');
-  btn.textContent = set.done ? '✓ Tehty' : '✓ Sarja tehty';
 
   updateProgress();
 
@@ -1771,7 +1795,7 @@ function markAllDone(ei) {
       if (repsInp) repsInp.value = set.reps;
       row.querySelectorAll('.weight-adj').forEach(function(b) { b.disabled = true; });
       const btn = row.querySelector('.check-btn');
-      if (btn) { btn.className = 'check-btn checked'; btn.textContent = '✓ Tehty'; }
+      if (btn) { btn.className = 'check-btn checked'; }
     }
   });
   persist();
@@ -1782,6 +1806,17 @@ function markAllDone(ei) {
     if (markBtn) markBtn.remove();
   }
   updateProgress();
+}
+
+function toggleEasy(ei) {
+  const ex = currentWorkout.exercises[ei];
+  ex.easy = !ex.easy;
+  persist();
+  const card = document.getElementById('card-' + ei);
+  if (card) {
+    const btn = card.querySelector('.easy-btn');
+    if (btn) btn.className = 'easy-btn' + (ex.easy ? ' flagged' : '');
+  }
 }
 
 // ─────────────────────────────────────────────
