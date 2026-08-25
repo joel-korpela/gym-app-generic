@@ -25,6 +25,60 @@
       --danger: #e05252;
     }
 
+    /* ── Themes ──────────────────────────────── */
+    [data-theme="black-white"] {
+      --bg: #0a0a0a;
+      --card: #1a1a1a;
+      --card2: #222222;
+      --deep: #000000;
+      --accent: #ffffff;
+      --accent-dim: #cccccc;
+      --blue: #333333;
+      --text: #f0f0f0;
+      --muted: #888888;
+      --border: #404040;
+      --danger: #ff6b6b;
+    }
+    [data-theme="forest"] {
+      --bg: #0d1f0d;
+      --card: #132213;
+      --card2: #1a2e1a;
+      --deep: #081408;
+      --accent: #4caf50;
+      --accent-dim: #388e3c;
+      --blue: #1b3a1b;
+      --text: #d4edd4;
+      --muted: #7a9e7a;
+      --border: #2e522e;
+      --danger: #e05252;
+    }
+    [data-theme="sunset"] {
+      --bg: #1f0d0d;
+      --card: #2e1313;
+      --card2: #3d1a1a;
+      --deep: #140808;
+      --accent: #ff6b35;
+      --accent-dim: #cc5528;
+      --blue: #4a1a1a;
+      --text: #f5d5c5;
+      --muted: #9e7a6a;
+      --border: #5a2a2a;
+      --danger: #e05252;
+    }
+    [data-theme="ocean"] {
+      --bg: #0d1a2e;
+      --card: #0f2040;
+      --card2: #132850;
+      --deep: #080f1a;
+      --accent: #00d4ff;
+      --accent-dim: #00a8cc;
+      --blue: #0a1f3d;
+      --text: #c0e8f5;
+      --muted: #5a8fa0;
+      --border: #1a3a5c;
+      --danger: #e05252;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     html, body {
@@ -670,6 +724,63 @@
       flex-shrink: 0;
     }
 
+    /* ── Remove set button ───────────────────── */
+    .remove-set-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--danger);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+      opacity: 0.7;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    .remove-set-btn:active { opacity: 1; background: rgba(224,82,82,0.18); }
+
+    /* ── Settings tab ────────────────────────── */
+    .settings-wrap { padding: 16px 12px; }
+    .settings-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+    }
+    .theme-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .theme-btn {
+      padding: 14px 10px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .theme-btn.active { border-color: var(--accent); color: var(--accent); }
+    .theme-btn .theme-preview {
+      width: 100%;
+      height: 28px;
+      border-radius: 6px;
+      margin-bottom: 7px;
+    }
+
     /* ── Add set button ──────────────────────── */
     .add-set-btn {
       display: flex;
@@ -749,6 +860,7 @@
     <div class="tab" data-tab="exercises" onclick="showTab('exercises')">⚙️ Liikkeet</div>
     <div class="tab" data-tab="history" onclick="showTab('history')">📅 Historia</div>
     <div class="tab" data-tab="cloud" onclick="showTab('cloud')">☁️ iCloud</div>
+    <div class="tab" data-tab="settings" onclick="showTab('settings')">🎨 Teemat</div>
   </div>
 
   <!-- Scrollable content -->
@@ -835,6 +947,14 @@
       </div>
     </div>
 
+    <!-- SETTINGS TAB -->
+    <div id="tab-settings" class="section">
+      <div class="settings-wrap">
+        <div class="settings-section-title">🎨 Teema</div>
+        <div class="theme-grid" id="theme-grid"></div>
+      </div>
+    </div>
+
   </div><!-- /content -->
 
   <!-- Action bar (workout tab only) -->
@@ -915,6 +1035,47 @@ let singlePlanMode = false; // when true, auto-switch is disabled
 
 let timerInterval  = null;
 let timerRemaining = 0;
+let currentTheme   = 'default';
+
+// ─────────────────────────────────────────────
+//  THEMES
+// ─────────────────────────────────────────────
+const THEMES = [
+  { id: 'default',     label: '🌙 Dark Blue',   bg: '#1a1a2e', accent: '#f0a500' },
+  { id: 'black-white', label: '⬛ Black & White', bg: '#0a0a0a', accent: '#ffffff' },
+  { id: 'forest',      label: '🌿 Forest',       bg: '#0d1f0d', accent: '#4caf50' },
+  { id: 'sunset',      label: '🌅 Sunset',       bg: '#1f0d0d', accent: '#ff6b35' },
+  { id: 'ocean',       label: '🌊 Ocean',        bg: '#0d1a2e', accent: '#00d4ff' }
+];
+
+function applyTheme(id) {
+  currentTheme = id;
+  if (id === 'default') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', id);
+  }
+  renderThemeGrid();
+}
+
+function renderThemeGrid() {
+  const grid = document.getElementById('theme-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  THEMES.forEach(function(t) {
+    const btn = document.createElement('button');
+    btn.className = 'theme-btn' + (currentTheme === t.id ? ' active' : '');
+    btn.innerHTML =
+      '<div class="theme-preview" style="background:' + t.bg + ';border:2px solid ' + t.accent + '"></div>' +
+      t.label;
+    btn.onclick = function() {
+      applyTheme(t.id);
+      localStorage.setItem('gs_theme', t.id);
+      showToast('🎨 Teema vaihdettu: ' + t.label);
+    };
+    grid.appendChild(btn);
+  });
+}
 
 // ─────────────────────────────────────────────
 //  INIT
@@ -924,6 +1085,7 @@ function init() {
   renderWorkout();
   renderHistory();
   renderExerciseSelect();
+  renderThemeGrid();
   updateDate();
   renderPlanBadge();
 }
@@ -1082,6 +1244,8 @@ function loadData() {
   try { const p = localStorage.getItem('gs_planB'); if (p) planB = JSON.parse(p); } catch(e) {}
   try { const p = localStorage.getItem('gs_activePlan'); if (p !== null) activePlan = p || null; } catch(e) {}
   try { const p = localStorage.getItem('gs_singlePlanMode'); if (p !== null) singlePlanMode = p === 'true'; } catch(e) {}
+  try { const t = localStorage.getItem('gs_theme'); if (t) currentTheme = t; } catch(e) {}
+  applyTheme(currentTheme);
 
   try {
     const c = localStorage.getItem('gs_current');
@@ -1266,7 +1430,8 @@ function renderWorkout() {
           '</div>' +
         '</div>' +
         '<button class="check-btn' + (set.done ? ' checked' : '') + '"' +
-        ' onclick="toggleSet(' + ei + ',' + si + ')">' + (set.done ? '✓ Tehty' : '✓ Sarja tehty') + '</button>';
+        ' onclick="toggleSet(' + ei + ',' + si + ')">' + (set.done ? '✓ Tehty' : '✓ Sarja tehty') + '</button>' +
+        '<button class="remove-set-btn" onclick="removeSet(' + ei + ',' + si + ')" title="Poista sarja">✕</button>';
       card.appendChild(row);
     });
 
@@ -1300,6 +1465,14 @@ function addSet(ei) {
   const ex = currentWorkout.exercises[ei];
   const lastSet = ex.sets[ex.sets.length - 1];
   ex.sets.push({ weight: lastSet ? lastSet.weight : '', reps: '', done: false });
+  persist();
+  renderWorkout();
+}
+
+function removeSet(ei, si) {
+  const ex = currentWorkout.exercises[ei];
+  if (ex.sets.length <= 1) { showToast('⚠️ Ei voi poistaa viimeistä sarjaa'); return; }
+  ex.sets.splice(si, 1);
   persist();
   renderWorkout();
 }
@@ -1790,6 +1963,9 @@ function showTab(name) {
   if (name === 'exercises') {
     pendingSelection = null;
     renderExerciseSelect();
+  }
+  if (name === 'settings') {
+    renderThemeGrid();
   }
 }
 
