@@ -1067,7 +1067,7 @@ function renderThemeGrid() {
     btn.className = 'theme-btn' + (currentTheme === t.id ? ' active' : '');
     btn.innerHTML =
       '<div class="theme-preview" style="background:' + t.bg + ';border:2px solid ' + t.accent + '"></div>' +
-      t.label;
+      esc(t.label);
     btn.onclick = function() {
       applyTheme(t.id);
       localStorage.setItem('gs_theme', t.id);
@@ -1085,7 +1085,6 @@ function init() {
   renderWorkout();
   renderHistory();
   renderExerciseSelect();
-  renderThemeGrid();
   updateDate();
   renderPlanBadge();
 }
