@@ -78,6 +78,45 @@
       --border: #1a3a5c;
       --danger: #e05252;
     }
+    [data-theme="evangelion"] {
+      --bg: #12062a;
+      --card: #1e0d42;
+      --card2: #2a1258;
+      --deep: #08031a;
+      --accent: #e8003d;
+      --accent-dim: #b5002f;
+      --blue: #3a1a6e;
+      --text: #e8d0ff;
+      --muted: #9a70cc;
+      --border: #4a1a8a;
+      --danger: #ff2255;
+    }
+    [data-theme="soft-anime"] {
+      --bg: #f0ede6;
+      --card: #e6e1d8;
+      --card2: #dbd4c9;
+      --deep: #f8f6f2;
+      --accent: #5ab87a;
+      --accent-dim: #3d9960;
+      --blue: #c9dfd0;
+      --text: #2e2a25;
+      --muted: #7a7060;
+      --border: #c0b8aa;
+      --danger: #e05252;
+    }
+    [data-theme="conquer"] {
+      --bg: #1a1a1a;
+      --card: #262626;
+      --card2: #303030;
+      --deep: #0d0d0d;
+      --accent: #f5f5f5;
+      --accent-dim: #b0b0b0;
+      --blue: #3a3a3a;
+      --text: #f0f0f0;
+      --muted: #808080;
+      --border: #4a4a4a;
+      --danger: #cc3333;
+    }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -1045,7 +1084,10 @@ const THEMES = [
   { id: 'black-white', label: '⬛ Black & White', bg: '#0a0a0a', accent: '#ffffff' },
   { id: 'forest',      label: '🌿 Forest',       bg: '#0d1f0d', accent: '#4caf50' },
   { id: 'sunset',      label: '🌅 Sunset',       bg: '#1f0d0d', accent: '#ff6b35' },
-  { id: 'ocean',       label: '🌊 Ocean',        bg: '#0d1a2e', accent: '#00d4ff' }
+  { id: 'ocean',       label: '🌊 Ocean',        bg: '#0d1a2e', accent: '#00d4ff' },
+  { id: 'evangelion', label: '🔴 Evangelion',    bg: '#12062a', accent: '#e8003d' },
+  { id: 'soft-anime', label: '🍃 Soft Anime',    bg: '#f0ede6', accent: '#5ab87a' },
+  { id: 'conquer',    label: '🏆 Conquer',       bg: '#1a1a1a', accent: '#f5f5f5' }
 ];
 
 function applyTheme(id) {
