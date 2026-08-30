@@ -23,6 +23,7 @@
       --muted: #888;
       --border: #2a3f6f;
       --danger: #e05252;
+      --on-accent: #1a1a2e;
     }
 
     /* ── Themes ──────────────────────────────── */
@@ -38,6 +39,7 @@
       --muted: #888888;
       --border: #404040;
       --danger: #ff6b6b;
+      --on-accent: #0a0a0a;
     }
     [data-theme="forest"] {
       --bg: #0d1f0d;
@@ -51,6 +53,7 @@
       --muted: #7a9e7a;
       --border: #2e522e;
       --danger: #e05252;
+      --on-accent: #0d1f0d;
     }
     [data-theme="sunset"] {
       --bg: #1f0d0d;
@@ -64,6 +67,7 @@
       --muted: #9e7a6a;
       --border: #5a2a2a;
       --danger: #e05252;
+      --on-accent: #1f0d0d;
     }
     [data-theme="ocean"] {
       --bg: #0d1a2e;
@@ -77,6 +81,7 @@
       --muted: #5a8fa0;
       --border: #1a3a5c;
       --danger: #e05252;
+      --on-accent: #0d1a2e;
     }
     [data-theme="evangelion"] {
       --bg: transparent;
@@ -90,6 +95,7 @@
       --muted: #9a70cc;
       --border: #4a1a8a;
       --danger: #ff2255;
+      --on-accent: #12062a;
     }
     [data-theme="evangelion"] body {
       background-color: #12062a;
@@ -111,6 +117,7 @@
       --muted: #7a7060;
       --border: #c0b8aa;
       --danger: #e05252;
+      --on-accent: #f0ede6;
     }
     [data-theme="soft-anime"] body {
       background-color: #f0ede6;
@@ -132,6 +139,7 @@
       --muted: #808080;
       --border: #4a4a4a;
       --danger: #cc3333;
+      --on-accent: #1a1a1a;
     }
     [data-theme="conquer"] body {
       background-color: #1a1a1a;
@@ -153,6 +161,7 @@
       --muted: #b8a060;
       --border: #5a4000;
       --danger: #ff3300;
+      --on-accent: #0a051e;
     }
     [data-theme="vegeta"] body {
       background-color: #0a051e;
@@ -200,7 +209,7 @@
     }
     .variant-badge {
       background: var(--accent);
-      color: var(--bg);
+      color: var(--on-accent);
       font-size: 13px;
       font-weight: 800;
       padding: 1px 9px;
@@ -431,7 +440,7 @@
     .check-btn.checked {
       background: var(--accent);
       border-color: var(--accent);
-      color: var(--bg);
+      color: var(--on-accent);
     }
 
     /* ── Easy flag button ────────────────────── */
@@ -489,7 +498,7 @@
     #plan-info-bar.visible { display: flex; }
     #plan-badge {
       background: var(--accent);
-      color: var(--bg);
+      color: var(--on-accent);
       font-size: 12px;
       font-weight: 800;
       padding: 2px 9px;
@@ -544,7 +553,7 @@
     }
     .plan-save-btn.active-plan {
       background: var(--accent);
-      color: var(--bg);
+      color: var(--on-accent);
     }
     .plan-activate-btn {
       flex: 1;
@@ -612,7 +621,7 @@
       cursor: pointer;
       letter-spacing: -0.2px;
     }
-    .btn-gold { background: var(--accent); color: var(--bg); }
+    .btn-gold { background: var(--accent); color: var(--on-accent); }
     .btn-ghost {
       background: transparent;
       border: 1.5px solid var(--border);
@@ -699,7 +708,7 @@
       gap: 10px;
       letter-spacing: -0.2px;
     }
-    .cloud-btn-save { background: var(--accent); color: var(--bg); }
+    .cloud-btn-save { background: var(--accent); color: var(--on-accent); }
     .cloud-btn-restore { background: var(--blue); color: var(--text); }
     .cloud-info {
       background: var(--card);
@@ -739,7 +748,7 @@
       font-weight: 700;
       cursor: pointer;
       background: var(--accent);
-      color: var(--bg);
+      color: var(--on-accent);
       margin-top: 14px;
     }
     .exsel-item {
@@ -767,7 +776,7 @@
       font-size: 14px;
       transition: background 0.15s, border-color 0.15s;
     }
-    .exsel-check.checked { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+    .exsel-check.checked { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
     .exsel-info { flex: 1; }
     .exsel-name { font-size: 15px; font-weight: 600; color: var(--text); }
     .exsel-muscles { font-size: 12px; color: var(--muted); margin-top: 2px; }
