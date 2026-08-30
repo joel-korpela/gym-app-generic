@@ -209,7 +209,7 @@
     }
     .ex-muscles {
       font-size: 10px;
-      color: #4d6a9a;
+      color: var(--muted);
       margin-top: 2px;
       font-style: italic;
     }
@@ -237,7 +237,7 @@
       font-variant-numeric: tabular-nums;
     }
     #timer-display.urgent { color: var(--danger); }
-    #timer-label { color: #ccc; flex: 1; font-size: 14px; }
+    #timer-label { color: var(--muted); flex: 1; font-size: 14px; }
     #timer-skip-btn {
       background: transparent;
       border: 1.5px solid var(--accent);
@@ -335,7 +335,7 @@
     }
     .ex-prev {
       font-size: 11px;
-      color: #5a7aaa;
+      color: var(--muted);
       text-align: right;
       flex-shrink: 0;
       max-width: 38%;
@@ -353,7 +353,7 @@
     }
     .set-row:last-child { border-bottom: none; }
     .set-row.done {
-      background: rgba(13,27,53,0.5);
+      background: rgba(0, 0, 0, 0.12);
     }
     .set-row.done .set-inp { opacity: 0.45; }
 
@@ -386,7 +386,7 @@
     }
     .set-field-label {
       font-size: 10px;
-      color: #555566;
+      color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
@@ -437,8 +437,8 @@
     /* ── Easy flag button ────────────────────── */
     .easy-btn {
       background: transparent;
-      border: 1.5px solid #555;
-      color: #888;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
       font-size: 13px;
       padding: 2px 7px;
       border-radius: 8px;
@@ -449,7 +449,7 @@
       transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
     .easy-btn.flagged {
-      background: #1a3a1a;
+      background: rgba(76, 175, 80, 0.15);
       border-color: #4caf50;
       color: #4caf50;
     }
@@ -679,7 +679,7 @@
       font-size: 13px;
     }
     .hist-ex:last-child { border-bottom: none; }
-    .hist-ex-name { color: #ccc; font-weight: 600; }
+    .hist-ex-name { color: var(--text); font-weight: 600; }
     .hist-ex-sets { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
     /* ── Cloud section ───────────────────────── */
@@ -771,7 +771,7 @@
     .exsel-info { flex: 1; }
     .exsel-name { font-size: 15px; font-weight: 600; color: var(--text); }
     .exsel-muscles { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .exsel-note { font-size: 11px; color: #4d6a9a; font-style: italic; }
+    .exsel-note { font-size: 11px; color: var(--muted); font-style: italic; }
     .exsel-count {
       font-size: 13px;
       color: var(--accent);
@@ -910,7 +910,7 @@
     .empty {
       text-align: center;
       padding: 50px 20px;
-      color: #444;
+      color: var(--muted);
       font-size: 15px;
       line-height: 1.7;
     }
@@ -921,8 +921,8 @@
       bottom: 90px;
       left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: #333;
-      color: #fff;
+      background: var(--card2);
+      color: var(--text);
       padding: 10px 20px;
       border-radius: 20px;
       font-size: 14px;
