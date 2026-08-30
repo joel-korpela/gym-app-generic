@@ -462,6 +462,16 @@
       border-color: #4caf50;
       color: #4caf50;
     }
+    .easy-boosted-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #4caf50;
+      background: rgba(76, 175, 80, 0.13);
+      border: 1px solid #4caf50;
+      border-radius: 7px;
+      padding: 2px 7px;
+      white-space: nowrap;
+    }
 
     /* ── Weight adjust buttons ───────────────── */
     .weight-inp-wrap {
@@ -1421,12 +1431,14 @@ function newWorkout(keepWeights) {
 
   // Build previous weights per exercise name (search full history, newest first)
   const prevWeightsByName = {};
+  const prevEasyByName    = {};
   if (workoutHistory.length > 0) {
     for (let wi = workoutHistory.length - 1; wi >= 0; wi--) {
       const hw = workoutHistory[wi];
       hw.exercises.forEach(function(ex) {
         if (!prevWeightsByName[ex.name]) {
           prevWeightsByName[ex.name] = ex.sets.map(function(s) { return s.weight || ''; });
+          prevEasyByName[ex.name]    = !!ex.easy;
         }
       });
     }
@@ -1435,15 +1447,22 @@ function newWorkout(keepWeights) {
   currentWorkout = {
     date:     new Date().toISOString(),
     exercises: exDefs.map(function(ex, i) {
+      const wasEasy = prevEasyByName[ex.name];
       return {
-        name: ex.name,
+        name:        ex.name,
+        easyBoosted: keepWeights && wasEasy,
         sets: Array.from({ length: ex.sets }, function(_, j) {
-          return {
-            weight: keepWeights ? (prevWeightsByName[ex.name] && prevWeightsByName[ex.name][j] != null
-                     ? prevWeightsByName[ex.name][j] : '') : '',
-            reps:   '',
-            done:   false
-          };
+          let w = '';
+          if (keepWeights && prevWeightsByName[ex.name] && prevWeightsByName[ex.name][j] != null) {
+            const base = prevWeightsByName[ex.name][j];
+            if (wasEasy && base !== '') {
+              const bumped = (parseFloat(base) || 0) + 2.5;
+              w = String(bumped % 1 === 0 ? bumped : bumped.toFixed(1));
+            } else {
+              w = base;
+            }
+          }
+          return { weight: w, reps: '', done: false };
         })
       };
     })
@@ -1491,6 +1510,9 @@ function renderWorkout() {
       if (pw.length) {
         prevHtml = '<div class="ex-prev">📊 Edellinen:<br>' + pw.join(' / ') + '</div>';
       }
+    }
+    if (ex.easyBoosted) {
+      prevHtml += '<div class="easy-boosted-badge">⬆️ Paino nostettu +2.5 kg</div>';
     }
 
     const noteHtml    = def.note    ? ' <span class="ex-note">(' + def.note + ')</span>'  : '';
